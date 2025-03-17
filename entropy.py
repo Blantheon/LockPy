@@ -4,24 +4,26 @@ from math import log2
 def calculate_entropy_string(password: str) -> int:
     # calculate range of a given password before calculate entropy
     VALUES = {'lower': 26, 'upper': 26, 'int': 10, 'special' : 32}
-    check = {'lower': False, 'upper': False, 'int': False, 'special': False}
+    check = {'lower': True, 'upper': True, 'int': True, 'special': True}
     res = 0
-    password = set(password)
-    for char in password:
-        # the maximum value
-        if res == 94: break
+    password_set = set(password)
+    for char in password_set:
+        if char.isalpha():
+            if char.islower() and check['lower']:
+                res += VALUES['lower']
+                check['lower'] = False
+            if char.isupper() and check['upper']:
+                res += VALUES['upper']
+                check['upper'] = False
         
-        if char in ascii_lowercase and not check['lower']:
-            res += VALUES['lower']
-            check['lower'] = True
-        if char in ascii_uppercase and not check['upper']:
-            res += VALUES['upper']
-            check['upper'] = True
-        if char.isdigit() and not check['int']:
-            res += VALUES['int']
-            check['int'] = True
-        if not char.isalnum() and not check['special']:
+        elif char.isnumeric():
+            if check['int']:
+                res += VALUES['int']
+                check['int'] = False
+            
+        elif check['special']:
             res += VALUES['special']
-            check['special'] = True
+            check['special'] = False
     
+    # expression for calculate entropy
     return len(password) * log2(res)
