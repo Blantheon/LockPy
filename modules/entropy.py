@@ -35,4 +35,11 @@ def calculate_entropy_string(password: str, range_password=0) -> int:
 
 def create_password_string(entropy: int) -> Tuple[str, int]:
     ENTROPY_BY_CHAR = 6.55
-    return (p := ''.join(choice(printable) for _ in range(round(entropy / ENTROPY_BY_CHAR) + 1))), calculate_entropy_string(p, 94)
+    step = round(entropy / ENTROPY_BY_CHAR) + 1
+    password = ''.join(choice(printable) for _ in range(step))
+    
+    return password, calculate_entropy_string(password, 94)
+
+
+if __name__ == '__main__':
+    print(create_password_string(int(input('Enter int: '))))

@@ -15,7 +15,14 @@ class Test_entropy_module(unittest.TestCase):
         self.assertEqual(entropy.calculate_entropy_string('1Bankruptcies2&%', 94), 104.87)
     
     def test_entropy_of_password_created(self):
-        self.assertGreaterEqual(entropy.create_password_string(12))
+        password = entropy.create_password_string(3)
+        self.assertGreaterEqual(password[1], 3)
+        
+        password = entropy.create_password_string(50)
+        self.assertGreaterEqual(password[1], 50)
+        
+        password = entropy.create_password_string(150)
+        self.assertGreaterEqual(password[1], 150)
 
 
 
