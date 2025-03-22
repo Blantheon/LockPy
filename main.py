@@ -11,3 +11,9 @@ parser.add_argument('--version', action='version', version='Pswd Calculator 1.0'
 args = parser.parse_args()
 print(args.filename, args.entropy, args.verbose)
 print(args)
+
+
+
+
+if __name__ == '__main__':
+    pass

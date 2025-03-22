@@ -30,10 +30,9 @@ def calculate_entropy_string(password: str, range_password=0) -> int:
                 check['special'] = False
     
     # expression for calculate entropy
-    return len(password) * log2(range_password)
+    return round(len(password) * log2(range_password), 2)
 
 
 def create_password_string(entropy: int) -> Tuple[str, int]:
-    ENTROPY_BY_CHAR = 6.554588851677638
+    ENTROPY_BY_CHAR = 6.55
     return (p := ''.join(choice(printable) for _ in range(round(entropy / ENTROPY_BY_CHAR) + 1))), calculate_entropy_string(p, 94)
-
