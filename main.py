@@ -5,6 +5,7 @@ import modules.entropy as entropy
 # resctrict number of arguments: https://stackoverflow.com/questions/13310047/how-do-i-constrain-my-python-script-to-only-accepting-one-argument-argparse
 
 def check_diceware(arguments):
+    # This function return a tuple or an int 
     if len(arguments) > 2:
         raise AttributeError(f'The diceware flag take only one ore two arguments in the following: int, str. See: python3 {sys.argv[0]} create -h')
         
