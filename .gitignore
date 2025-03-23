@@ -4,3 +4,5 @@
 # ignore pycache
 __pycache__/
 
+# ignore my ressources
+ressources.txt

@@ -1,7 +1,4 @@
-from string import printable
 from math import log2
-from typing import Tuple
-from random import choice
 
 def calculate_entropy_string(password: str, range_password=0) -> int:
     if not range_password:
@@ -32,14 +29,3 @@ def calculate_entropy_string(password: str, range_password=0) -> int:
     # expression for calculate entropy
     return round(len(password) * log2(range_password), 2)
 
-
-def create_password_string(entropy: int) -> Tuple[str, int]:
-    ENTROPY_BY_CHAR = 6.55
-    step = round(entropy / ENTROPY_BY_CHAR) + 1
-    password = ''.join(choice(printable) for _ in range(step))
-    
-    return password, calculate_entropy_string(password, 94)
-
-
-if __name__ == '__main__':
-    print(create_password_string(int(input('Enter int: '))))
