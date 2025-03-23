@@ -46,7 +46,7 @@ I welcome contributions! Feel free to submit pull requests or open issues to sug
 
 License
 
-This project is licensed under the MIT License. See the LICENSE file for details.
+This project is licensed under the MIT License.
 
 Contact
 

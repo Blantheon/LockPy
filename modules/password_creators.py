@@ -2,7 +2,6 @@ from random import choice, randint
 from entropy import calculate_entropy_string
 from string import printable
 from typing import Tuple
-from getpass import getuser
 from random_functions import find_path
 
 
@@ -11,7 +10,7 @@ def create_password_string(entropy: int) -> Tuple[str, int]:
     step = round(entropy / ENTROPY_BY_CHAR) + 1
     password = ''.join(choice(printable) for _ in range(step))
     
-    return password, calculate_entropy_string(password, 94)
+    return (password, calculate_entropy_string(password, 94))
 
 
 def binary_search(number: int, lines: str) -> str:
@@ -43,6 +42,3 @@ def create_password_diceware(entropy: int, lst=False) -> Tuple[str, int]:
             
             number = int(number)
             words.append(binary_search(number, lines))
-
-
-create_password_diceware(90)
