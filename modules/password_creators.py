@@ -2,7 +2,7 @@ from random import choice, randint
 from entropy import calculate_entropy_string
 from string import printable
 from typing import Tuple
-from random_functions import find_path
+from getpass import getuser
 
 
 def create_password_string(entropy: int) -> Tuple[str, int]:
@@ -24,7 +24,7 @@ def binary_search(number: int, lines: str) -> str:
 
 def create_password_diceware(entropy: int, lst=False) -> Tuple[str, int]:
     if not lst:
-        lst = find_path('/home/username/Desktop/password_generator/lists/en.txt')
+        lst = '/home/' + getuser() + '/Desktop/password_generator/lists/en.txt'
         
     with open(lst, 'r') as file:
         lines = file.readlines()
