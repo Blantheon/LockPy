@@ -1,4 +1,5 @@
 import argparse
+from modules.random_functions import path
 import modules.password_creators as password_mod
 
 
@@ -37,7 +38,8 @@ if not args.string and not args.diceware:
 
 if args.string:
     entropy_user = args.string
-    password_mod.create_password_string(entropy_user)
+    string_password = password_mod.create_password_string(entropy_user)
+    print(string_password)
 if args.diceware:
     # entropy_path == tuple(entropy, path) or tuple(entropy)
     entropy_path = check_diceware(args.diceware)
