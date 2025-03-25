@@ -1,5 +1,5 @@
 import argparse
-from modules.random_functions import path
+from sys import argv
 import modules.password_creators as password_mod
 
 
@@ -21,29 +21,35 @@ def check_diceware(arguments):
     return int(arguments[0])
 
 
-parser = argparse.ArgumentParser(usage="%(prog)s [options]")
-subparsers = parser.add_subparsers(metavar='create', required=True)
+def parsing(arguments):
+    parser = argparse.ArgumentParser(usage="%(prog)s [options]")
+    subparsers = parser.add_subparsers(metavar='create', required=True)
 
-parser_create = subparsers.add_parser('create', help='Should be used with -s or -d flag, see: python3 main.py create -h')
-parser_create = parser_create.add_mutually_exclusive_group()
-parser_create.add_argument('-s', '--string', type=int, metavar='Int',help='the minimal entropy for the string password ')
-parser_create.add_argument('-d', '--diceware', nargs='+', metavar='Int, str', help='the minimal entropy for the diceware password | OPTIONAL: a second argument with the path to the list')
+    parser_create = subparsers.add_parser('create', help='Should be used with -s or -d flag, see: python3 main.py create -h')
+    parser_create = parser_create.add_mutually_exclusive_group()
+    parser_create.add_argument('-s', '--string', type=int, metavar='Int',help='the minimal entropy for the string password ')
+    parser_create.add_argument('-d', '--diceware', nargs='+', metavar='Int, str', help='the minimal entropy for the diceware password | OPTIONAL: a second argument with the path to the list')
 
-#parser.add_argument('--calculate', type=str, default = False, help='You\'r password | calculate the entropy of you\'r password')
-#parser.add_argument('-v', '--verbose', action='store_true', default=False)
-parser.add_argument('--version', action='version', version='Pswd Calculator 1.0')
-args = parser.parse_args()
-if not args.string and not args.diceware:
-    raise AttributeError(f'A flag should be selected when the subcommand create is used, see: python3 main.py create -h')
+    #parser.add_argument('--calculate', type=str, default = False, help='You\'r password | calculate the entropy of you\'r password')
+    #parser.add_argument('-v', '--verbose', action='store_true', default=False)
+    parser.add_argument('--version', action='version', version='Pswd Calculator 1.0')
+    return parser.parse_args(arguments)
 
-if args.string:
-    entropy_user = args.string
-    string_password = password_mod.create_password_string(entropy_user)
-    print(string_password)
-if args.diceware:
-    # entropy_path == tuple(entropy, path) or tuple(entropy)
-    entropy_path = check_diceware(args.diceware)
-    print(entropy_path)
+
+def main():
+    args = parsing(argv[1:])
+    
+    if not args.string and not args.diceware:
+        raise AttributeError(f'A flag should be selected when the subcommand create is used, see: python3 main.py create -h')
+
+    if args.string:
+        entropy_user = args.string
+        string_password = password_mod.create_password_string(entropy_user)
+        print(string_password)
+    if args.diceware:
+        # entropy_path == tuple(entropy, path) or tuple(entropy)
+        entropy_path = check_diceware(args.diceware)
+
 
 if __name__ == '__main__':
-    pass
+    main()
