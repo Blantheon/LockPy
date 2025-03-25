@@ -1,5 +1,5 @@
 import argparse
-from sys import argv
+from modules.__init__ import path
 import modules.password_creators as password_mod
 
 
@@ -20,8 +20,7 @@ def check_diceware(arguments):
         raise AttributeError('The diceware flag should take an int in argument')
     return int(arguments[0])
 
-
-def parsing(arguments):
+def main():
     parser = argparse.ArgumentParser(usage="%(prog)s [options]")
     subparsers = parser.add_subparsers(metavar='create', required=True)
 
@@ -33,12 +32,7 @@ def parsing(arguments):
     #parser.add_argument('--calculate', type=str, default = False, help='You\'r password | calculate the entropy of you\'r password')
     #parser.add_argument('-v', '--verbose', action='store_true', default=False)
     parser.add_argument('--version', action='version', version='Pswd Calculator 1.0')
-    return parser.parse_args(arguments)
-
-
-def main():
-    args = parsing(argv[1:])
-    
+    args = parser.parse_args()
     if not args.string and not args.diceware:
         raise AttributeError(f'A flag should be selected when the subcommand create is used, see: python3 main.py create -h')
 
@@ -49,7 +43,7 @@ def main():
     if args.diceware:
         # entropy_path == tuple(entropy, path) or tuple(entropy)
         entropy_path = check_diceware(args.diceware)
-
+        print(entropy_path)
 
 if __name__ == '__main__':
     main()
