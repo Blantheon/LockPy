@@ -15,8 +15,7 @@ class TestMain(unittest.TestCase):
             main()
         self.assertIn('error: the following arguments are required: create', mock_stderr.getvalue())
     
-    @patch('sys.stderr', new_callable=StringIO)
-    @patch('sys.argv', new=['main.py', 'create'])
+    
 
     def test_incomplete_parsing2(self, mock_stdout):
         with self.assertRaises(AttributeError):
