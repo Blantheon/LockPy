@@ -1,6 +1,6 @@
-Password Manager & Generator
+#Password Manager & Generator
 
-Overview
+###Overview
 
 Welcome to the Password Manager & Generator, a secure and efficient tool for creating strong passwords with minimal entropy requirements. This project is designed to help users generate robust passwords for enhanced security.
 
@@ -14,7 +14,7 @@ Features
 
 ✅ Open-source and customizable
 
-Future Features
+###Future Features
 
 I'm actively working on improving this project. Here are some planned features:
 
@@ -28,27 +28,27 @@ I'm actively working on improving this project. Here are some planned features:
 
 📱 Cross-platform GUI application
 
-Installation
+####Installation
 
 To install the Password Manager & Generator, clone this repository:
 
 git clone https://github.com/Blantheon/password_generator.git cd password-generator
 
-Usage
+####Usage
 
 Run the script to view different options
 
 python password_generator.py -h
 
-Contributing
+##Contributing
 
 I welcome contributions! Feel free to submit pull requests or open issues to suggest improvements.
 
-License
+##License
 
 This project is licensed under the MIT License.
 
-Contact
+##Contact
 
 For any inquiries or suggestions, feel free to reach out:
 
