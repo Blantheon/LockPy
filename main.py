@@ -35,9 +35,16 @@ def parser(arguments: list[str]):
     #parser.add_argument('-v', '--verbose', action='store_true', default=False)
     parser.add_argument('--version', action='version', version='Pswd Calculator 1.0')
     args = parser.parse_args(arguments)
+    
     if not args.string and not args.diceware:
         raise AttributeError(f'A flag should be selected when the subcommand create is used, see: python3 main.py create -h')
+    return args
+    
 
+
+if __name__ == '__main__':
+    args = parser(sys.argv[1:])
+    
     if args.string:
         entropy_user = args.string
         string_password = password_mod.create_password_string(entropy_user)
@@ -46,7 +53,3 @@ def parser(arguments: list[str]):
         # entropy_path == tuple(entropy, path) or tuple(entropy)
         entropy_path = check_diceware(args.diceware)
         print(entropy_path)
-
-
-if __name__ == '__main__':
-    parser(sys.argv[1:])
