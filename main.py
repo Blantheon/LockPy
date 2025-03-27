@@ -7,18 +7,18 @@ import modules.password_creators as password_mod
 def check_diceware(arguments):
     # This function return a tuple or an int 
     if len(arguments) > 2:
-        raise AttributeError(f'The diceware flag take only one ore two arguments in the following: int, str. See: python3 main.py create -h')
+        raise ValueError(f'The diceware flag take only one ore two arguments in the following: int, str. See: python3 main.py create -h')
         
     if len(arguments) == 2:
         if not arguments[0].isnumeric():
-            raise AttributeError('The diceware flag should take an int in first argument')
+            raise ValueError('The diceware flag should take an int in first argument')
         # check location of flag with os module
         #if os.blablabla:
 
         return (int(arguments[0]), arguments[1])
     
     if not arguments[0].isnumeric():
-        raise AttributeError('The diceware flag should take an int in argument')
+        raise ValueError('The diceware flag should take an int in argument')
     return int(arguments[0])
 
 
@@ -38,6 +38,8 @@ def parser(arguments: list[str]):
     
     if not args.string and not args.diceware:
         raise AttributeError(f'A flag should be selected when the subcommand create is used, see: python3 main.py create -h')
+    if args.diceware:
+        check_diceware(args.diceware)
     return args
     
 
