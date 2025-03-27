@@ -4,7 +4,7 @@ import io
 from argparse import ArgumentError
 import contextlib
 from sys import argv
-from main import parser
+from lockpy import parser
 
 
 class TestPrimaryParsing(unittest.TestCase):

@@ -1,8 +1,8 @@
-# Password Manager & Generator
+# LockPy / Password Manager & Generator
 
 ### Overview
 
-Welcome to the Password Manager & Generator, a secure and efficient tool for creating strong passwords with minimal entropy requirements. This project is designed to help users generate robust passwords for enhanced security.
+Welcome to LockPy, a secure and efficient tool for creating strong passwords with minimal entropy requirements. This project is designed to help users generate robust passwords for enhanced security.
 
 Features
 
@@ -26,19 +26,19 @@ I'm actively working on improving this project. Here are some planned features:
 
 🔄 Auto-fill and retrieval functionality
 
-📱 Cross-platform GUI application
+📱 GUI application
 
 #### Installation
 
 To install the Password Manager & Generator, clone this repository:
 
-git clone https://github.com/Blantheon/password_generator.git cd password-generator
+git clone https://github.com/Blantheon/LockPy.git && cd LockPy
 
 #### Usage
 
 Run the script to view different options
 
-python password_generator.py -h
+python lockpy.py -h
 
 ## Contributing
 

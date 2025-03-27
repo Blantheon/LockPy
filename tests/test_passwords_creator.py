@@ -1,8 +1,6 @@
 import unittest
-from sys import path
-from getpass import getuser
-path.insert(0, '/home/' + getuser() + '/Desktop/password_generator/modules')
-import password_creators
+from __init__ import path
+import modules.password_creators as password_creators
 
 class TestPasswordsCreators(unittest.TestCase):
     def test_create_password_string(self):
