@@ -1,10 +1,8 @@
 import unittest
-from sys import path
-from getpass import getuser
-path.insert(0, '/home/' + getuser() + '/Desktop/password_generator/modules')
-import entropy
+from __init__ import path
+import modules.entropy as entropy
 
-class Test_entropy_module(unittest.TestCase):
+class TestEntropyModule(unittest.TestCase):
     def test_calculate_range(self):
         # test without a given range
         self.assertEqual(entropy.calculate_entropy_string('Bankruptcies'), 68.41)
