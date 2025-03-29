@@ -4,29 +4,29 @@
 
 Welcome to LockPy, a secure and efficient tool for creating strong passwords with minimal entropy requirements. This project is designed to help users generate robust passwords for enhanced security.
 
-Features
+### Features
 
-✅ Generate strong passwords with a minimum entropy requirement
+- ✅ Generate strong passwords with a minimum entropy requirement
 
-✅ User-friendly command-line interface (CLI)
+- ✅ User-friendly command-line interface (CLI)
 
-✅ Lightweight and fast
+- ✅ Lightweight and fast
 
-✅ Open-source and customizable
+- ✅ Open-source and customizable
 
 ### Future Features
 
 I'm actively working on improving this project. Here are some planned features:
 
-🔒 Secure password storage with encryption
+- 🔒 Secure password storage with encryption
 
-🔑 Integration with popular password managers (e.g., Bitwarden, LastPass)
+- 🔑 Integration with popular password managers (e.g., Bitwarden, LastPass)
 
-🛠️ Password strength analysis
+- 🛠️ Password strength analysis
 
-🔄 Auto-fill and retrieval functionality
+- 🔄 Auto-fill and retrieval functionality
 
-📱 GUI application
+- 📱 GUI application
 
 #### Installation
 

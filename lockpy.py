@@ -1,6 +1,8 @@
 import argparse
 import sys
-from modules.__init__ import path
+import warnings
+from getpass import getuser
+import os
 import modules.password_creators as password_mod
 
 
@@ -12,10 +14,13 @@ def check_diceware(arguments):
     if len(arguments) == 2:
         if not arguments[0].isnumeric():
             raise ValueError('The diceware flag should take an int in first argument')
-        # check location of flag with os module
-        #if os.blablabla:
-
-        return (int(arguments[0]), arguments[1])
+        # check location of the flag lists with os module
+        if os.path.isfile(arguments[1]):
+            return (int(arguments[0]), arguments[1])
+        else:
+            warnings.warn('The path you entered is invalid, the list that is used is the default english diceware list')
+            print('\n')
+            return (int(arguments[0]), '/home/' + getuser() + '/Desktop/lockpy/lists/en.txt')
     
     if not arguments[0].isnumeric():
         raise ValueError('The diceware flag should take an int in argument')
@@ -39,19 +44,17 @@ def parser(arguments: list[str]):
     if not args.string and not args.diceware:
         raise AttributeError(f'A flag should be selected when the subcommand create is used, see: python3 main.py create -h')
     if args.diceware:
-        check_diceware(args.diceware)
-    return args
+        return {'dict': check_diceware(args.diceware)}
+    return {'str': args.string}
     
 
 
 if __name__ == '__main__':
-    args = parser(sys.argv[1:])
+    options = parser(parser(sys.argv[1:]))
     
-    if args.string:
-        entropy_user = args.string
+    if options.get('str'):
+        entropy_user = options['str']
         string_password = password_mod.create_password_string(entropy_user)
         print(string_password)
-    if args.diceware:
+    #if args.diceware:
         # entropy_path == tuple(entropy, path) or tuple(entropy)
-        entropy_path = check_diceware(args.diceware)
-        print(entropy_path)

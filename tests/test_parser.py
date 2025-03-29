@@ -54,6 +54,20 @@ class TestCreateParsing(unittest.TestCase):
         self.assertEqual(cm.exception.code, 2)
         self.assertEqual(self.f.getvalue(), f'usage: {argv[0]} [options]\n{argv[0]}: error: unrecognized arguments: --my-invalid-flag\n')
 
+    # str and dice flag together
+    def test_str_and_dice_together(self):
+        with self.assertRaises(SystemExit) as cm, contextlib.redirect_stderr(self.f):
+            parser(['create', '-d', '95', '-s', '120'])
+        self.assertEqual(cm.exception.code, 2)
+        self.assertEqual(self.f.getvalue(), f'usage: {argv[0]} [options] create [-h] [-s Int | -d Int, str [Int, str ...]]\n{argv[0]} [options] create: error: argument -s/--string: not allowed with argument -d/--diceware\n')
+    
+
+class TestStrFlag(unittest.TestCase):
+
+    def __init__(self, methodName = "runTest"):
+        self.f = io.StringIO()
+        super().__init__(methodName)
+
 
     # str flag without argument
     def test_empty_str_flag(self):
@@ -61,22 +75,6 @@ class TestCreateParsing(unittest.TestCase):
             parser(['create', '-s'])
         self.assertEqual(cm.exception.code, 2)
         self.assertEqual(self.f.getvalue(), f'usage: {argv[0]} [options] create [-h] [-s Int | -d Int, str [Int, str ...]]\n{argv[0]} [options] create: error: argument -s/--string: expected one argument\n')
-    
-
-    # dice flag without argument
-    def test_empty_dice_flag(self):
-        with self.assertRaises(SystemExit) as cm, contextlib.redirect_stderr(self.f):
-            parser(['create', '-d'])
-        self.assertEqual(cm.exception.code, 2)
-        self.assertEqual(self.f.getvalue(), f'usage: {argv[0]} [options] create [-h] [-s Int | -d Int, str [Int, str ...]]\n{argv[0]} [options] create: error: argument -d/--diceware: expected at least one argument\n')
-
-
-    # str and dice flag together
-    def test_str_and_dice_together(self):
-        with self.assertRaises(SystemExit) as cm, contextlib.redirect_stderr(self.f):
-            parser(['create', '-d', '95', '-s', '120'])
-        self.assertEqual(cm.exception.code, 2)
-        self.assertEqual(self.f.getvalue(), f'usage: {argv[0]} [options] create [-h] [-s Int | -d Int, str [Int, str ...]]\n{argv[0]} [options] create: error: argument -s/--string: not allowed with argument -d/--diceware\n')
     
 
     # str flag with a bad argument
@@ -94,6 +92,14 @@ class TestCreateParsing(unittest.TestCase):
         self.assertEqual(cm.exception.code, 2)
         self.assertEqual(self.f.getvalue(), f'usage: {argv[0]} [options]\n{argv[0]}: error: unrecognized arguments: string\n')
 
+
+class TestDicewareFlag(unittest.TestCase):
+
+    def __init__(self, methodName = "runTest"):
+        self.f = io.StringIO()
+        super().__init__(methodName)
+
+
     # too many arguments
     def test_dice_too_many_arguments(self):
         with self.assertRaises(ValueError) as cm:
@@ -108,11 +114,25 @@ class TestCreateParsing(unittest.TestCase):
         self.assertEqual(cm.exception.args[0], f'The diceware flag should take an int in argument')
 
 
+    # dice flag without argument
+    def test_empty_dice_flag(self):
+        with self.assertRaises(SystemExit) as cm, contextlib.redirect_stderr(self.f):
+            parser(['create', '-d'])
+        self.assertEqual(cm.exception.code, 2)
+        self.assertEqual(self.f.getvalue(), f'usage: {argv[0]} [options] create [-h] [-s Int | -d Int, str [Int, str ...]]\n{argv[0]} [options] create: error: argument -d/--diceware: expected at least one argument\n')
+
+
     # dice flag with one bad arguments
     def test_dice_bad_arguments(self):
         with self.assertRaises(ValueError) as cm:
             parser(['create', '-d', 'string_instead_int', '95'])
         self.assertEqual(cm.exception.args[0], f'The diceware flag should take an int in first argument')
+
+
+    def test_dice_bad_list(self):
+        with self.assertWarns(UserWarning) as cm:
+            parser(['create', '-d', '95', '/home/bad_path'])
+        self.assertEqual(str(cm.warning), 'The path you entered is invalid, the list that is used is the default english diceware list')
 
 
 
