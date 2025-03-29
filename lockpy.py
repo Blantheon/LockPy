@@ -24,7 +24,7 @@ def check_diceware(arguments):
     
     if not arguments[0].isnumeric():
         raise ValueError('The diceware flag should take an int in argument')
-    return int(arguments[0])
+    return (int(arguments[0]), '/home/' + getuser() + '/Desktop/lockpy/lists/en.txt')
 
 
 def parser(arguments: list[str]):
@@ -50,11 +50,12 @@ def parser(arguments: list[str]):
 
 
 if __name__ == '__main__':
-    options = parser(parser(sys.argv[1:]))
+    # options = {'str': int(entropy)} or {'dict': (int(entropy), str(path to list))}
+    options = parser(['create', '-s', '95']) #sys.argv[1:])
     
     if options.get('str'):
         entropy_user = options['str']
         string_password = password_mod.create_password_string(entropy_user)
-        print(string_password)
+        print(f'You\'r new password with an entropy of {string_password[1]} is:\n{repr(string_password[0])}')
     #if args.diceware:
         # entropy_path == tuple(entropy, path) or tuple(entropy)
