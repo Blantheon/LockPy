@@ -29,3 +29,8 @@ def calculate_entropy_string(password: str, range_password=0) -> int:
     # expression for calculate entropy
     return round(len(password) * log2(range_password), 2)
 
+
+def calculate_entropy_diceware(password: str):
+    ENTROPY_BY_WORD = 12.92
+    lst = password.split()
+    return len(lst) * ENTROPY_BY_WORD

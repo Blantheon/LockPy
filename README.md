@@ -32,13 +32,13 @@ I'm actively working on improving this project. Here are some planned features:
 
 To install the Password Manager & Generator, clone this repository:
 
-git clone https://github.com/Blantheon/LockPy.git && cd LockPy
+> git clone https://github.com/Blantheon/LockPy.git && cd lockpy
 
 #### Usage
 
 Run the script to view different options
 
-python lockpy.py -h
+> python lockpy.py -h
 
 ## Contributing
 

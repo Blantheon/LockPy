@@ -1,8 +1,27 @@
 from random import choice, randint
-from entropy import calculate_entropy_string
+from entropy import calculate_entropy_string, calculate_entropy_diceware
 from string import printable
 from typing import Tuple
-from getpass import getuser
+
+
+def binary_search(number: str, lines: str) -> str:
+    # implement binary search for construct the diceware password
+    higher = len(lines) - 1
+    lower = 0
+    while lower <= higher:
+        
+        index = (higher + lower) // 2
+
+        if lines[index][0:5] == number:
+            return lines[index].strip('\n\t123456')
+        
+        if lines[index][0:5] < number:
+            lower = index + 1
+
+        if lines[index][0:5] > number:
+            higher = index - 1
+    print(number)
+    raise ValueError('The number is not in the list, please be sure you\'r list use 5 number beetwen 1 and 6')
 
 
 def create_password_string(entropy: int) -> Tuple[str, int]:
@@ -13,25 +32,14 @@ def create_password_string(entropy: int) -> Tuple[str, int]:
     return (password, calculate_entropy_string(password, 94))
 
 
-def binary_search(number: int, lines: str) -> str:
-    '''# implement binary search for construct the diceware password
-    index = len(lines) // 2
-    
-    if lines[index][0:5] == number:
-        return lines[index]'''
-    pass
-
-
-def create_password_diceware(entropy: int, lst=False) -> Tuple[str, int]:
-    if not lst:
-        lst = '/home/' + getuser() + '/Desktop/password_generator/lists/en.txt'
+def create_password_diceware(entropy: int, lst) -> Tuple[str, int]:
         
     with open(lst, 'r') as file:
         lines = file.readlines()
         ENTROPY_BY_WORD = 12.92
         number_of_words = round(entropy / ENTROPY_BY_WORD)
         words = []
-        
+
         if number_of_words * ENTROPY_BY_WORD < entropy:
             number_of_words += 1
 
@@ -40,5 +48,6 @@ def create_password_diceware(entropy: int, lst=False) -> Tuple[str, int]:
             for _ in range(5):
                 number += str(randint(1, 6))
             
-            number = int(number)
             words.append(binary_search(number, lines))
+            password = ' '.join(words)
+        return (password, calculate_entropy_diceware(password))
