@@ -1,7 +1,6 @@
 import unittest
 from __init__ import path
 import io
-from argparse import ArgumentError
 import contextlib
 from sys import argv
 from lockpy import parser
@@ -140,7 +139,7 @@ class TestDicewareFlag(unittest.TestCase):
     def test_dice_too_many_arguments(self):
         with self.assertRaises(ValueError) as cm:
             parser(['create', '-d', '59', 'string1', 'string2'])
-        self.assertEqual(cm.exception.args[0], f'The diceware flag take only one ore two arguments in the following: int, str. See: python3 main.py create -h')
+        self.assertEqual(cm.exception.args[0], f'The diceware flag take only one or two arguments in the following: int, str. See: python3 main.py create -h')
 
 
     # dice flag with one bad argument 

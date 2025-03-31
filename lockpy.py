@@ -4,7 +4,7 @@ import warnings
 from getpass import getuser
 import os
 from typing import Tuple
-import modules.password_creators as password_mod
+import modules.create_modules.password_creators as password_mod
 
 
 def check_diceware(arguments: list[str]) -> Tuple[int, str]:

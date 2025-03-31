@@ -1,6 +1,6 @@
 import unittest
 from __init__ import path
-import modules.password_creators as password_creators
+import modules.create_modules.password_creators as password_creators
 
 class TestStringPasswordsCreators(unittest.TestCase):
     def test_create_password_string(self):
