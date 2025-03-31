@@ -20,7 +20,7 @@ I'm actively working on improving this project. Here are some planned features:
 
 - 🔒 Secure password storage with encryption
 
-- 🔑 Integration with popular password managers (e.g., Bitwarden, LastPass)
+- 🔑 Integration with popular password managers (e.g., KeepPassXC, Bitwarden, LastPass)
 
 - 🛠️ Password strength analysis
 
