@@ -37,9 +37,6 @@ def parser(arguments: list[str]):
     parser_create = parser_create.add_mutually_exclusive_group()
     parser_create.add_argument('-s', '--string', type=int, metavar='Int',help='the minimal entropy for the string password ')
     parser_create.add_argument('-d', '--diceware', nargs='+', metavar='Int, str', help='the minimal entropy for the diceware password | OPTIONAL: a second argument with the path to the list')
-
-    #parser.add_argument('--calculate', type=str, default = False, help='You\'r password | calculate the entropy of you\'r password')
-    #parser.add_argument('-v', '--verbose', action='store_true', default=False)
     parser.add_argument('--version', action='version', version='Pswd Calculator 1.0')
     args = parser.parse_args(arguments)
     
