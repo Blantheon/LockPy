@@ -9,7 +9,7 @@ import modules.password_creators as password_mod
 
 def check_diceware(arguments: list[str]) -> Tuple[int, str]:
     if len(arguments) > 2:
-        raise ValueError(f'The diceware flag take only one ore two arguments in the following: int, str. See: python3 main.py create -h')
+        raise ValueError(f'The diceware flag take only one or two arguments in the following: int, str. See: python3 main.py create -h')
     if not arguments[0].isnumeric():
         raise ValueError('The diceware flag should take a positive int in first argument')
     if int(arguments[0]) <= 0:

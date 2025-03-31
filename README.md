@@ -52,6 +52,6 @@ This project is licensed under the MIT License.
 
 For any inquiries or suggestions, feel free to reach out:
 
-📧 Email: batheon@proton.me
+📧 Email: blantheon@proton.me
 
 🐙 GitHub: Blantheon
