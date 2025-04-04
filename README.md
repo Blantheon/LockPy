@@ -20,17 +20,17 @@ I'm actively working on improving this project. Here are some planned features:
 
 - 🔒 Secure password storage with encryption
 
-- 🔑 Integration with popular password managers (e.g., KeepPassXC, Bitwarden, LastPass)
+- 🔑 Integration with KeepPassXC
 
 - 🛠️ Password strength analysis
 
-- 🔄 Auto-fill and retrieval functionality
+- 📲 Check password status on HaveibeenpawnedAPI
 
-- 📱 GUI application
+- 🔄 Auto-fill and retrieval functionality
 
 #### Installation
 
-To install the Password Manager & Generator, clone this repository:
+To install the Password Generator, clone this repository:
 
 > git clone https://github.com/Blantheon/LockPy.git && cd lockpy
 
@@ -38,7 +38,7 @@ To install the Password Manager & Generator, clone this repository:
 
 Run the script to view different options
 
-> python lockpy.py -h
+> python3 lockpy.py -h
 
 ## Contributing
 

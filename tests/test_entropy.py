@@ -1,6 +1,6 @@
 import unittest
 from __init__ import path
-import modules.create_modules.entropy as entropy
+import modules.check_modules.entropy as entropy
 
 class TestEntropyModule(unittest.TestCase):
     def test_calculate_range(self):
