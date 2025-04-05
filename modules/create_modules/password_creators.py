@@ -1,5 +1,5 @@
 from random import choice, randint
-from __init__ import path
+from .__init__ import path
 from check_modules.entropy import calculate_entropy_string, calculate_entropy_diceware
 from string import printable
 from typing import Tuple
