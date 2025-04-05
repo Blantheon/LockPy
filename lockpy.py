@@ -31,15 +31,25 @@ def check_diceware(arguments: list[str]) -> Tuple[int, str]:
 
 def parser(arguments: list[str]):
     parser = argparse.ArgumentParser(usage="%(prog)s [options]")
-    subparsers = parser.add_subparsers(metavar='create', required=True)
-
-    parser_create = subparsers.add_parser('create', help='Should be used with -s or -d flag, see: python3 main.py create -h')
+    parser.add_argument('--version', action='version', version='LockPy 1.0')
+    subparsers = parser.add_subparsers(required=True)
+    
+    parser_create = subparsers.add_parser('create', help='To Write, see: python3 main.py create -h')
     parser_create = parser_create.add_mutually_exclusive_group()
     parser_create.add_argument('-s', '--string', type=int, metavar='Int',help='the minimal entropy for the string password ')
     parser_create.add_argument('-d', '--diceware', nargs='+', metavar='Int, str', help='the minimal entropy for the diceware password | OPTIONAL: a second argument with the path to the list')
-    parser.add_argument('--version', action='version', version='Pswd Calculator 1.0')
+
+    
+    parser_check = subparsers.add_parser('check', help='To Write')
+    parser_check = parser_check.add_mutually_exclusive_group()
+    parser_check.add_argument('-c', '--calculate',type=str, metavar='Str', help='To Write')
+    parser_check.add_argument('-p', '--pawn', type=str, metavar='Str', help='To Write')
+    
+    
     args = parser.parse_args(arguments)
     
+
+    # This big tree of if will disappear and become a class in few times
     if not args.string and not args.diceware:
         raise ValueError(f'A flag with an entropy greater than 0 should be selected when the subcommand create is used, see: python3 main.py create -h')
     elif args.diceware:
