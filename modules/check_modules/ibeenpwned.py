@@ -14,8 +14,8 @@ def check_password_pawned(password: str) -> Tuple[bool, int]:
     for line in res.text.splitlines():
         if last in line:
             num = line.split(':')[1]
-            return f"You'r password have been compomised and appear a total of {num} time in their database"
-    return 'You\'r password is not detected in the database of haveibeenpawn'
+            return f"The password have been compromised and appear a total of {num} time in their database"
+    return 'The password is not detected in the database of haveibeenpawned'
 
 
 
