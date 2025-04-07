@@ -72,17 +72,18 @@ if __name__ == '__main__':
     options = parser(sys.argv[1:])
 
     # This big tree of if will disappear and become a class in few times
-    if options.get('str'):
-        entropy_user = options['str']
-        if int(entropy_user) < 0:
-            raise ValueError('Negative entropy is not allowed')
-        password = password_mod.create_password_string(entropy_user)
-    
-    if options.get('dice'):
-        entropy_user, list_path = options['dice']
-        password = password_mod.create_password_diceware(entropy_user, list_path)
+    if options.get('str') or options.get('dice'):
+        if options.get('str'):
+            entropy_user = options['str']
+            if int(entropy_user) < 0:
+                raise ValueError('Negative entropy is not allowed')
+            password = password_mod.create_password_string(entropy_user)
+        
+        if options.get('dice'):
+            entropy_user, list_path = options['dice']
+            password = password_mod.create_password_diceware(entropy_user, list_path)
 
-    print(f'The new password with an entropy of {password[1]} is:\n{repr(password[0])}')
+        print(f'The new password with an entropy of {password[1]} is:\n{repr(password[0])}')
     
     
     if options.get('calculate'):

@@ -19,7 +19,7 @@ class TestPrimaryParsing(unittest.TestCase):
         with self.assertRaises(SystemExit) as cm, contextlib.redirect_stderr(self.f):
             parser('')
         self.assertEqual(cm.exception.code, 2)
-        self.assertEqual(self.f.getvalue() , f'usage: {argv[0]} [options]\n{argv[0]}: error: the following arguments are required: {{create,check}}\n')
+        self.assertEqual(self.f.getvalue() , f'usage: {argv[0]} [options]\n{argv[0]}: error: the following arguments are required: command\n')
 
 
     # invalvalid parameter
@@ -27,7 +27,7 @@ class TestPrimaryParsing(unittest.TestCase):
         with self.assertRaises(SystemExit) as cm, contextlib.redirect_stderr(self.f):
             parser(['Bad_Parsing'])
         self.assertEqual(cm.exception.code, 2)
-        self.assertEqual(self.f.getvalue(), f'usage: {argv[0]} [options]\n{argv[0]}: error: argument {{create,check}}: invalid choice: \'Bad_Parsing\' (choose from \'create\', \'check\')\n')
+        self.assertEqual(self.f.getvalue(), f'usage: {argv[0]} [options]\n{argv[0]}: error: argument command: invalid choice: \'Bad_Parsing\' (choose from \'create\', \'check\')\n')
 
     
 
