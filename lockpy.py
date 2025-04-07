@@ -48,6 +48,8 @@ def parser(arguments: list[str]):
     
     args = parser.parse_args(arguments)
 
+    # -----------------Note----------------------
+    # continue the big if down for check options
 
     if not args.string and not args.diceware:
         raise ValueError(f'A flag with an entropy greater than 0 should be selected when the subcommand create is used, see: python3 main.py create -h')

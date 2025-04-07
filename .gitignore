@@ -6,3 +6,6 @@ __pycache__/
 
 # ignore my ressources
 ressources.txt
+
+# ignore CONTRIBUTING.md that is not finished
+CONTRIBUTING.md
