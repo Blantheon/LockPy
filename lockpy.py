@@ -11,7 +11,7 @@ import modules.check_modules.ibeenpwned as pawned
 
 def check_diceware(arguments: list[str]) -> Tuple[int, str]:
     if len(arguments) > 2:
-        raise ValueError(f'The diceware flag take only one or two arguments in the following: int, str. See: python3 main.py create -h')
+        raise ValueError(f'The diceware flag take only one or two arguments in the following: int, str. See: python3 lockpy.py create -h')
     if not arguments[0].isnumeric():
         raise ValueError('The diceware flag should take a positive int in first argument')
     if int(arguments[0]) <= 0:
@@ -71,7 +71,7 @@ def parser(arguments: list[str]):
             raise ValueError('A flag should be selected when the subcommand check is used, see: python3 lockpy.py create -h')
     
 
-if __name__ == '__main__':
+def main():
     options = parser(sys.argv[1:])
 
     # This big tree of if will disappear and become a class in few times
@@ -104,3 +104,7 @@ if __name__ == '__main__':
         password = options['pawn']
         message = pawned.check_password_pawned(password)
         print(message)
+
+
+if __name__ == '__main__':
+    main()
