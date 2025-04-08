@@ -1,4 +1,4 @@
-# LockPy / Password Manager & Generator
+# LockPy
 
 ### Overview
 
@@ -7,6 +7,8 @@ Welcome to LockPy, a secure and efficient tool for creating strong passwords wit
 ### Features
 
 - ✅ Generate strong passwords with a minimum entropy requirement
+
+- ✅ Calculate entropy of a password
 
 - ✅ Check password status on HaveibeenpawnedAPI
 
@@ -20,7 +22,7 @@ I'm actively working on improving this project. Here are some planned features:
 
 - 🔄 Auto-fill and retrieval functionality
 
-- 🔑 Integration with KeepPassXC
+- 🔑 Integration with popular password manager
 
 - 🔒 Secure password storage with encryption
 
