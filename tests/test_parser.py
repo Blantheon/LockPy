@@ -43,7 +43,7 @@ class TestCreateParsing(unittest.TestCase):
     def test_empty_create_parsing(self):
         with self.assertRaises(ValueError) as cm:
             parser(['create'])
-        self.assertEqual(cm.exception.args[0], f'A flag with an entropy greater than 0 should be selected when the subcommand create is used, see: python3 main.py create -h')
+        self.assertEqual(cm.exception.args[0], f'A flag with an entropy greater than 0 should be selected when the subcommand create is used, see: python3 lockpy.py create -h')
 
 
     # invalid flag
@@ -96,7 +96,7 @@ class TestStrFlag(unittest.TestCase):
     def test_str_flag_zero_entropy(self):
         with self.assertRaises(ValueError) as cm:
             parser(['create', '-s', '0'])
-        self.assertEqual(cm.exception.args[0], 'A flag with an entropy greater than 0 should be selected when the subcommand create is used, see: python3 main.py create -h')
+        self.assertEqual(cm.exception.args[0], 'A flag with an entropy greater than 0 should be selected when the subcommand create is used, see: python3 lockpy.py create -h')
 
 
 class TestDicewareFlag(unittest.TestCase):
@@ -176,6 +176,39 @@ class TestDicewareFlag(unittest.TestCase):
     def test_dice_two_good_arguments(self):
         self.assertEqual(parser(['create', '-d', '95', LIST_PATH]), {'dice': (95, LIST_PATH)})
 
+
+class TestCheckCommand(unittest.TestCase):
+    
+
+    def __init__(self, methodName = 'runTest'):
+        self.f = io.StringIO()
+        super().__init__(methodName)
+
+
+    def test_empty_check_command(self):
+        with self.assertRaises(ValueError) as cm, contextlib.redirect_stderr(self.f):
+            parser(['check'])
+        self.assertEqual(cm.exception.args[0], 'A flag should be selected when the subcommand check is used, see: python3 lockpy.py create -h')
+
+
+    def test_calculate_flag(self):
+        self.assertEqual(parser(['check', '-c' 'MyStringPassword']), {'calculate': 'MyStringPassword'})
+
+
+    def test_empty_calculate_flag(self):
+        with self.assertRaises(SystemExit) as cm, contextlib.redirect_stderr(self.f):
+            parser(['check', '-c'])
+        self.assertEqual(self.f.getvalue(), f'usage: {argv[0]} [options] check [-h] [-c Str | -p Str]\n{argv[0]} [options] check: error: argument -c/--calculate: expected one argument\n')
+    
+
+    def test_pawn_flag(self):
+        self.assertEqual(parser(['check', '-p', 'Password']), {'pawn': 'Password'})
+    
+
+    def test_empty_pawn_flag(self):
+        with self.assertRaises(SystemExit) as cm, contextlib.redirect_stderr(self.f):
+            parser(['check', '-p'])
+        self.assertEqual(self.f.getvalue(), f'usage: {argv[0]} [options] check [-h] [-c Str | -p Str]\n{argv[0]} [options] check: error: argument -p/--pawn: expected one argument\n')
 
 
 if __name__ == '__main__':

@@ -52,10 +52,11 @@ def parser(arguments: list[str]):
 
     # -----------------Note----------------------
     # continue the big if down for check options
+    # Add password saving in SQL database
 
     if args.command == 'create':
         if not args.string and not args.diceware:
-            raise ValueError(f'A flag with an entropy greater than 0 should be selected when the subcommand create is used, see: python3 main.py create -h')
+            raise ValueError(f'A flag with an entropy greater than 0 should be selected when the subcommand create is used, see: python3 lockpy.py create -h')
         elif args.diceware:
             return {'dice': check_diceware(args.diceware)}
         else:
@@ -64,8 +65,10 @@ def parser(arguments: list[str]):
     if args.command == 'check':
         if args.calculate:
             return {'calculate': args.calculate}
-        else:
+        elif args.pawn:
             return {'pawn': args.pawn}
+        else:
+            raise ValueError('A flag should be selected when the subcommand check is used, see: python3 lockpy.py create -h')
     
 
 if __name__ == '__main__':
@@ -79,7 +82,7 @@ if __name__ == '__main__':
                 raise ValueError('Negative entropy is not allowed')
             password = password_mod.create_password_string(entropy_user)
         
-        if options.get('dice'):
+        else:
             entropy_user, list_path = options['dice']
             password = password_mod.create_password_diceware(entropy_user, list_path)
 
