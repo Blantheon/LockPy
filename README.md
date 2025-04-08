@@ -8,25 +8,21 @@ Welcome to LockPy, a secure and efficient tool for creating strong passwords wit
 
 - ✅ Generate strong passwords with a minimum entropy requirement
 
+- ✅ Check password status on HaveibeenpawnedAPI
+
 - ✅ User-friendly command-line interface (CLI)
-
-- ✅ Lightweight and fast
-
-- ✅ Open-source and customizable
 
 ### Future Features
 
 I'm actively working on improving this project. Here are some planned features:
 
-- 🔒 Secure password storage with encryption
+- 🛠️ Password strength analysis
+
+- 🔄 Auto-fill and retrieval functionality
 
 - 🔑 Integration with KeepPassXC
 
-- 🛠️ Password strength analysis
-
-- 📲 Check password status on HaveibeenpawnedAPI
-
-- 🔄 Auto-fill and retrieval functionality
+- 🔒 Secure password storage with encryption
 
 #### Installation
 
