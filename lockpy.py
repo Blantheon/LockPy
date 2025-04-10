@@ -16,8 +16,10 @@ class NewPassword():
     def create_password_str(entropy_user):
         if int(entropy_user) < 0:
             raise ValueError('Negative entropy is not allowed')
-        return password_mod.create_password_string(entropy_user)
+        elif int(entropy_user < 90):
+            warnings.warn('For a strong password we recommend using at least 90 bit of entropy')
 
+        return password_mod.create_password_string(entropy_user)
 
     @staticmethod
     def create_password_dice(entropy_path):
@@ -36,7 +38,6 @@ class CheckMethods():
         else:
             print('The password is treated like a diceware password')
             return entropy.calculate_entropy_diceware(password)
-    
 
     @staticmethod
     def check_pawned(self, password):
@@ -111,15 +112,23 @@ def parser(arguments: list[str]):
     
 
 def main():
-    options = parser(['create', '-d', '59'])#sys.argv[1:])
+    options = parser(sys.argv[1:])
 
-    entropy_or_path = options[1]
+    key_method, user_input = options
     methods = {'str': NewPassword.create_password_str,
                'dice': NewPassword.create_password_dice,
                'calculate': CheckMethods.calculate_password_entropy,
                'pawn': CheckMethods.check_pawned}
     
-    print(methods[options[0]](entropy_or_path))
+    response_to_user = methods[key_method](user_input)
+
+    if key_method in ['str', 'dice']:
+        print(f'The new password with an entropy of {response_to_user[1]} is:\n{repr(response_to_user[0])}')
+    elif key_method == 'calculate':
+        print(f'the entropy of the password {user_input} is: {response_to_user}')
+    else:
+        # the message is directly returned by the function
+        print(user_input)
 
 
 if __name__ == '__main__':
