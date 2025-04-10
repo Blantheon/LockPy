@@ -40,7 +40,7 @@ class CheckMethods():
             return entropy.calculate_entropy_diceware(password)
 
     @staticmethod
-    def check_pawned(self, password):
+    def check_pawned(password):
         return pawned.check_password_pawned(password)
 
 
@@ -91,7 +91,7 @@ def parser(arguments: list[str]):
     args = parser.parse_args(arguments)
 
     # -----------------Note----------------------
-    # continue the big if down for check options
+    # Write test for main function
     # Add password saving in SQL database
 
     if args.command == 'create':
@@ -112,7 +112,7 @@ def parser(arguments: list[str]):
     
 
 def main():
-    options = parser(sys.argv[1:])
+    options = parser(['check', '-p', 'Password'])#sys.argv[1:])
 
     key_method, user_input = options
     methods = {'str': NewPassword.create_password_str,
@@ -128,7 +128,7 @@ def main():
         print(f'the entropy of the password {user_input} is: {response_to_user}')
     else:
         # the message is directly returned by the function
-        print(user_input)
+        print(response_to_user)
 
 
 if __name__ == '__main__':
