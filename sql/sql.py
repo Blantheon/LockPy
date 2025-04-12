@@ -10,3 +10,9 @@ class Database():
         self.con = sqlite3.connect(self.name)
         self.cursor = self.con.cursor().execute()
 
+
+
+
+db = Database('test.db')
+db.connect()
+db.cursor()
