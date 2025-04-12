@@ -21,6 +21,7 @@ class NewPassword():
 
         return password_mod.create_password_string(entropy_user)
 
+
     @staticmethod
     def create_password_dice(entropy_path):
         entropy_user, list_path = entropy_path
@@ -38,6 +39,7 @@ class CheckMethods():
         else:
             print('The password is treated like a diceware password')
             return entropy.calculate_entropy_diceware(password)
+
 
     @staticmethod
     def check_pawned(password):
@@ -91,7 +93,6 @@ def parser(arguments: list[str]):
     args = parser.parse_args(arguments)
 
     # -----------------Note----------------------
-    # Write test for main function
     # Add password saving in SQL database
 
     if args.command == 'create':
@@ -111,10 +112,8 @@ def parser(arguments: list[str]):
             raise ValueError('A flag should be selected when the subcommand check is used, see: python3 lockpy.py create -h')
     
 
-def main():
-    options = parser(['check', '-p', 'Password'])#sys.argv[1:])
-
-    key_method, user_input = options
+def main(args):
+    key_method, user_input = parser(args)
     methods = {'str': NewPassword.create_password_str,
                'dice': NewPassword.create_password_dice,
                'calculate': CheckMethods.calculate_password_entropy,
@@ -125,11 +124,11 @@ def main():
     if key_method in ['str', 'dice']:
         print(f'The new password with an entropy of {response_to_user[1]} is:\n{repr(response_to_user[0])}')
     elif key_method == 'calculate':
-        print(f'the entropy of the password {user_input} is: {response_to_user}')
+        print(f'The entropy of the password {user_input} is: {response_to_user}')
     else:
         # the message is directly returned by the function
         print(response_to_user)
 
 
 if __name__ == '__main__':
-    main()
+    main(sys.argv[1:])
