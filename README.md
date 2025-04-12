@@ -20,9 +20,9 @@ I'm actively working on improving this project. Here are some planned features:
 
 - 🛠️ Password strength analysis
 
-- 🔄 Auto-fill and retrieval functionality
+- 🔄 Firefox addon auto-fill and retrieval functionality
 
-- 🔑 Integration with popular password manager
+- 👻 Deamon to keep the password in RAM
 
 - 🔒 Secure password storage with encryption
 
