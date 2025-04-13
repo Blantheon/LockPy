@@ -11,5 +11,5 @@ ressources.txt
 CONTRIBUTING.md
 
 # ignore all db
-.db
-.sqlite
+sql/*.db
+sql/*.sqlite
