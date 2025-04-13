@@ -9,3 +9,7 @@ ressources.txt
 
 # ignore CONTRIBUTING.md that is not finished
 CONTRIBUTING.md
+
+# ignore test db
+test.db
+sql/test.db
