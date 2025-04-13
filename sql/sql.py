@@ -4,20 +4,18 @@ class Database():
 
     def __init__(self, path: str):
         self.path = 'sql/' + path
+        self.table = None
         self.connect()
 
 
     def __enter__(self):
+        self.con = sqlite3.connect(self.path)
+        self.cursor = self.con.cursor()
         return self
 
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.con.close()
-
-
-    def connect(self):
-        self.con = sqlite3.connect(self.path)
-        self.cursor = self.con.cursor()
 
 
     def create_table(self, name):

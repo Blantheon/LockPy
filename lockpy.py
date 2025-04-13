@@ -75,12 +75,12 @@ def parser(arguments: list[str]):
     
     parser_create = subparsers.add_parser('create', help='create a new password, see: python3 lockpy.py create -h')
     parser_create = parser_create.add_mutually_exclusive_group()
+    
     parser_create.add_argument('-s', '--string', type=int, metavar='Int',
                                help='the minimal entropy for the string password ')
     parser_create.add_argument('-d', '--diceware', nargs='+', metavar='Int, str', 
                                help='the minimal entropy for the diceware password | OPTIONAL: a second argument with the path to the list')
 
-    
     parser_check = subparsers.add_parser('check', 
                                          help="check the efficacity of you'r password, see python3 lockpy.py check -h")
     parser_check = parser_check.add_mutually_exclusive_group()
@@ -88,8 +88,6 @@ def parser(arguments: list[str]):
                               help='calculate entropy of a password')
     parser_check.add_argument('-p', '--pawn', type=str, metavar='Str',
                               help='check if a password has leaked on haveibeenpawned')
-    
-    
     args = parser.parse_args(arguments)
 
     # -----------------Note----------------------
