@@ -9,3 +9,7 @@ ressources.txt
 
 # ignore CONTRIBUTING.md that is not finished
 CONTRIBUTING.md
+
+# ignore all db
+.db
+.sqlite
