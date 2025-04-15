@@ -10,7 +10,7 @@ import modules.check_modules.ibeenpwned as pawned
 from sql.sql import Database
 
 
-# These class are used to do verification on user input and call function after that
+# These class are used to do verification on user input and call function after that  
 class NewPassword():
 
     @staticmethod
