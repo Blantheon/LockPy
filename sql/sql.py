@@ -54,9 +54,9 @@ class Database():
         self.cursor.execute(sql_command)
         self.con.commit()
 
-with Database('test.db') as db:
-    pass
-
+if __name__ == '__main__':
+    with Database('test.db') as db:
+        pass
 
 """
 # SQL query to view different table

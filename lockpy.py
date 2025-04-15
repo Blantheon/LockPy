@@ -7,6 +7,7 @@ from typing import Tuple
 import modules.create_modules.password_creators as password_mod
 import modules.check_modules.entropy as entropy
 import modules.check_modules.ibeenpwned as pawned
+from sql.sql import Database
 
 
 # These class are used to do verification on user input and call function after that
@@ -72,8 +73,9 @@ def parser(arguments: list[str]):
     parser = argparse.ArgumentParser(usage="%(prog)s [options]")
     parser.add_argument('--version', action='version', version='LockPy 1.0')
     subparsers = parser.add_subparsers(required=True, dest='command')
-    
-    parser_create = subparsers.add_parser('create', help='create a new password, see: python3 lockpy.py create -h')
+
+    parser_create = subparsers.add_parser('create', 
+                                          help='create a new password, see: python3 lockpy.py create -h')
     parser_create = parser_create.add_mutually_exclusive_group()
     parser_create.add_argument('-s', '--string', type=int, metavar='Int',
                                help='the minimal entropy for the string password ')
