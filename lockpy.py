@@ -21,12 +21,10 @@ class NewPassword():
 
         return password_mod.create_password_string(entropy_user)
 
-
     @staticmethod
     def create_password_dice(entropy_path):
         entropy_user, list_path = entropy_path
         return password_mod.create_password_diceware(entropy_user, list_path)
-
 
 class CheckMethods():
     
@@ -40,11 +38,9 @@ class CheckMethods():
             print('The password is treated like a diceware password')
             return entropy.calculate_entropy_diceware(password)
 
-
     @staticmethod
     def check_pawned(password):
         return pawned.check_password_pawned(password)
-
 
 def check_diceware(arguments: list[str]) -> Tuple[int, str]:
     if len(arguments) > 2:
