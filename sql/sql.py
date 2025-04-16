@@ -22,7 +22,7 @@ class Database():
 
     def create_table(self, name):
         sql_command = f'''CREATE TABLE {name}(\
-                        service TEXT PRIMARY KEY NOT NULL,\
+                        name TEXT PRIMARY KEY NOT NULL,\
                         password TEXT NOT NULL,\
                         url TEXT,\
                         description TEXT);'''

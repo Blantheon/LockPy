@@ -99,7 +99,7 @@ def parser(arguments: list[str]):
     parser_save.add_argument('-p', '--password', 
                             type=str, metavar='str', nargs='+', help='The password to save')
     parser_save.add_argument('-c', '--create',
-                             type=str, metavar='str | dice', help='Create a new string or dice password to save')
+                             type=str, metavar='str | dice', nargs='+', help='Create a new string or dice password to save')
     parser_save.add_argument('-u', '--url',
                              type=str, metavar='Str', help='The url of the password\'s site')
     parser_save.add_argument('-d', '--description',
@@ -133,22 +133,28 @@ def parser(arguments: list[str]):
     if args.command == 'save':
         if args.password and args.create:
             raise ValueError('The password flag and the create flag can\'t be used together')
+        if not args.password and not args.create:
+            raise ValueError('A flag between password ans create should be selected')
+        if args.create and len(args.create) != 2 or args.create and not args.create[1].isnumeric():
+            raise ValueError('The create flag should have two arguments like method (str or dice) and the entropy (95)')
+        if int(args.create[1]) <= 0:
+            raise ValueError('The entropy have to be superior to zero') 
 
-        return ('save', {'name': args.name, 'password': args.password, 'url': args.url, 'description': args.description})
+        return ('save', {'name': args.name, 'password': args.password, 'url': args.url, 'description': args.description, 'create': args.create})
         
     
-
 def main(args):
 
     subparse_choosed, user_values = parser(args)
     
+
+    methods = {'str': NewPassword.create_password_str,
+            'dice': NewPassword.create_password_dice,
+            'calculate': CheckMethods.calculate_password_entropy,
+            'pawn': CheckMethods.check_pawned}
+
     if subparse_choosed in ['create', 'check']:
-        key_method, user_input = user_values
-        methods = {'str': NewPassword.create_password_str,
-                'dice': NewPassword.create_password_dice,
-                'calculate': CheckMethods.calculate_password_entropy,
-                'pawn': CheckMethods.check_pawned}
-        
+        key_method, user_input = user_values       
         response_to_user = methods[key_method](user_input)
 
 
@@ -161,8 +167,28 @@ def main(args):
             print(response_to_user)
     
     if subparse_choosed == 'save':
-        print(user_values)
+        d = user_values
+        
+        # set to format's create_password functions
+        if d.get('create'):
+            if d['create'][0] == 'dice':
+                d['create'] = ('dice', check_diceware([d['create'][1]]))
+            else:
+                d['create'] = (d['create'][0], int(d['create'][1]))
+            
+            key_method, entropy = d['create'][0], d['create'][1]
+            password = methods[key_method](entropy)
+            print(f'You\'r new password with an entropy of {password[1]} is:\n{repr(password[0])}')
+
+            # set it in dictionnary
+            d.pop('create')
+            d['password'] = repr(password[0])
+        
+        d['description'] = ' '.join(d['description'])
+        with Database('password.db') as db:
+            print(f'({', '.join(d[i] if d[i] else 'NULL' for i in d )})')
 
 
 if __name__ == '__main__':
+    a = 'save -n google -d A google account -u https://google.com -c dice 56'
     main(sys.argv[1:])
