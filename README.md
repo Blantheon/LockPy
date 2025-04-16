@@ -18,8 +18,6 @@ Welcome to LockPy, a secure and efficient tool for creating strong passwords wit
 
 I'm actively working on improving this project. Here are some planned features:
 
-- 🛠️ Password strength analysis
-
 - 🔄 Firefox addon auto-fill and retrieval functionality
 
 - 👻 Deamon to keep the password in RAM

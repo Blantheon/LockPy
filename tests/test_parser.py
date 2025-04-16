@@ -92,6 +92,13 @@ class TestStrFlag(unittest.TestCase):
         self.assertEqual(self.f.getvalue(), f'usage: {argv[0]} [options]\n{argv[0]}: error: unrecognized arguments: string\n')
     
 
+    '''    def test_str_entropy_less_90(self):
+        with self.assertWarns(UserWarning) as cm:
+            resp = parser(['create', '-s', '50'])
+        self.assertEqual(str(cm.warning), 'For a strong password we recommend using at least 90 bit of entropy')
+        self.assertEqual(resp, ('create', 'str', 50))
+
+    '''
     # str flag with 0 entropy
     def test_str_flag_zero_entropy(self):
         with self.assertRaises(ValueError) as cm:
@@ -132,7 +139,7 @@ class TestDicewareFlag(unittest.TestCase):
         with self.assertWarns(UserWarning) as cm:
             resp = parser(['create', '-d', '26'])
         self.assertEqual(str(cm.warning), 'For a strong password we recommend using at least 90 bit of entropy')
-        self.assertEqual(resp, ('dice', (26, LIST_PATH)))
+        self.assertEqual(resp, ('create', 'dice', (26, LIST_PATH)))
 
 
     # too many arguments
@@ -168,13 +175,13 @@ class TestDicewareFlag(unittest.TestCase):
         with self.assertWarns(UserWarning) as cm:
             resp = parser(['create', '-d', '95', '/home/bad_path'])
         self.assertEqual(str(cm.warning), 'The path entered is invalid, the list that is used is the default english diceware list')
-        self.assertEqual(resp, ('dice', (95, LIST_PATH)))
+        self.assertEqual(resp, ('create', 'dice', (95, LIST_PATH)))
 
     def test_dice_one_good_argumen(self):
-        self.assertEqual(parser(['create', '-d', '95']), ('dice', (95, LIST_PATH)))
+        self.assertEqual(parser(['create', '-d', '95']), ('create', 'dice', (95, LIST_PATH)))
     
     def test_dice_two_good_arguments(self):
-        self.assertEqual(parser(['create', '-d', '95', LIST_PATH]), ('dice', (95, LIST_PATH)))
+        self.assertEqual(parser(['create', '-d', '95', LIST_PATH]), ('create', 'dice', (95, LIST_PATH)))
 
 
 class TestCheckCommand(unittest.TestCase):
@@ -192,7 +199,7 @@ class TestCheckCommand(unittest.TestCase):
 
 
     def test_calculate_flag(self):
-        self.assertEqual(parser(['check', '-c' 'MyStringPassword']), ('calculate', 'MyStringPassword'))
+        self.assertEqual(parser(['check', '-c' 'MyStringPassword']), ('check', 'calculate', 'MyStringPassword'))
 
 
     def test_empty_calculate_flag(self):
@@ -202,7 +209,7 @@ class TestCheckCommand(unittest.TestCase):
     
 
     def test_pawn_flag(self):
-        self.assertEqual(parser(['check', '-p', 'Password']), ('pawn', 'Password'))
+        self.assertEqual(parser(['check', '-p', 'Password']), ('check', 'pawn', 'Password'))
     
 
     def test_empty_pawn_flag(self):
