@@ -97,11 +97,15 @@ def parser(arguments: list[str]):
     parser_save.add_argument('-n', '--name', 
                             type=str, metavar='Str', help='The name of the service for the password')
     parser_save.add_argument('-p', '--password', 
-                            type=str, metavar=str, nargs='+', required=True, help='The password to save')
+                            type=str, metavar='str', nargs='+', help='The password to save')
+    parser_save.add_argument('-c', '--create',
+                             type=str, metavar='str | dice', help='Create a new string or dice password to save')
     parser_save.add_argument('-u', '--url',
                              type=str, metavar='Str', help='The url of the password\'s site')
     parser_save.add_argument('-d', '--description',
                              type=str, metavar='Str', nargs='+' ,help='A description saved in the database')
+    
+
 
 
     
@@ -114,32 +118,40 @@ def parser(arguments: list[str]):
         if not args.string and not args.diceware:
             raise ValueError(f'A flag with an entropy greater than 0 should be selected when the subcommand create is used, see: python3 lockpy.py create -h')
         elif args.diceware:
-            return ('create','dice', check_diceware(args.diceware))
+            return ('create',('dice', check_diceware(args.diceware)))
         else:
-            return ('create', 'str', args.string)
+            return ('create', ('str', args.string))
     
     if args.command == 'check':
         if args.calculate:
-            return ('check', 'calculate', args.calculate)
+            return ('check', ('calculate', args.calculate))
         elif args.pawn:
-            return ('check', 'pawn', args.pawn)
+            return ('check', ('pawn', args.pawn))
         else:
             raise ValueError('A flag should be selected when the subcommand check is used, see: python3 lockpy.py create -h')
     
     if args.command == 'save':
+        if args.password and args.create:
+            raise ValueError('The password flag and the create flag can\'t be used together')
+
+        return ('save', {'name': args.name, 'password': args.password, 'url': args.url, 'description': args.description})
         
     
 
 def main(args):
-    subparse_choosed, key_method, user_input = parser(args)
-    methods = {'str': NewPassword.create_password_str,
-               'dice': NewPassword.create_password_dice,
-               'calculate': CheckMethods.calculate_password_entropy,
-               'pawn': CheckMethods.check_pawned}
-    
-    response_to_user = methods[key_method](user_input)
 
+    subparse_choosed, user_values = parser(args)
+    
     if subparse_choosed in ['create', 'check']:
+        key_method, user_input = user_values
+        methods = {'str': NewPassword.create_password_str,
+                'dice': NewPassword.create_password_dice,
+                'calculate': CheckMethods.calculate_password_entropy,
+                'pawn': CheckMethods.check_pawned}
+        
+        response_to_user = methods[key_method](user_input)
+
+
         if key_method in ['str', 'dice']:
             print(f'The new password with an entropy of {response_to_user[1]} is:\n{repr(response_to_user[0])}')
         elif key_method == 'calculate':
@@ -147,6 +159,9 @@ def main(args):
         else:
             # the message is directly returned by the function
             print(response_to_user)
+    
+    if subparse_choosed == 'save':
+        print(user_values)
 
 
 if __name__ == '__main__':
