@@ -14,7 +14,7 @@ from sql.sql import Database
 class NewPassword():
 
     @staticmethod
-    def create_password_str(entropy_user):
+    def create_password_str(entropy_user: int) -> str:
         if int(entropy_user) < 0:
             raise ValueError('Negative entropy is not allowed')
         elif int(entropy_user < 90):
@@ -24,7 +24,7 @@ class NewPassword():
 
 
     @staticmethod
-    def create_password_dice(entropy_path):
+    def create_password_dice(entropy_path: list[str, int]) -> str:
         entropy_user, list_path = entropy_path
         return password_mod.create_password_diceware(entropy_user, list_path)
 
@@ -32,7 +32,7 @@ class NewPassword():
 class CheckMethods():
     
     @staticmethod
-    def calculate_password_entropy(password):
+    def calculate_password_entropy(password: str) -> str:
         nb_spaces = password.count(' ')
         if nb_spaces <= 2:
             print('The password is treated as a string password')
@@ -43,7 +43,7 @@ class CheckMethods():
 
 
     @staticmethod
-    def check_pawned(password):
+    def check_pawned(password: str) -> str:
         return pawned.check_password_pawned(password)
 
 
@@ -105,14 +105,11 @@ def parser(arguments: list[str]):
     parser_save.add_argument('-d', '--description',
                              type=str, metavar='Str', nargs='+' ,help='A description saved in the database')
     
-
-
-
     
     args = parser.parse_args(arguments)
 
     # -----------------Note----------------------
-    # Add password saving in SQL database
+    # Add password saving in SQL database / write test for it
 
     if args.command == 'create':
         if not args.string and not args.diceware:
@@ -146,8 +143,6 @@ def parser(arguments: list[str]):
 def main(args):
 
     subparse_choosed, user_values = parser(args)
-    
-
     methods = {'str': NewPassword.create_password_str,
             'dice': NewPassword.create_password_dice,
             'calculate': CheckMethods.calculate_password_entropy,
@@ -182,11 +177,11 @@ def main(args):
 
             # set it in dictionnary
             d.pop('create')
-            d['password'] = repr(password[0])
+            d['password'] = repr(password[0]).strip('"\'')
         
         d['description'] = ' '.join(d['description'])
         with Database('password.db') as db:
-            print(f'({', '.join(d[i] if d[i] else 'NULL' for i in d )})')
+            db.add_in_db('password', f'({', '.join(f'"{d[i]}"' if d[i] else 'NULL' for i in d )})')
 
 
 if __name__ == '__main__':
