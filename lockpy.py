@@ -27,6 +27,31 @@ class NewPassword():
     def create_password_dice(entropy_path: list[str, int]) -> str:
         entropy_user, list_path = entropy_path
         return password_mod.create_password_diceware(entropy_user, list_path)
+    
+
+    @staticmethod
+    def save_and_create_password(d, methods):
+        # set to format's NewPassword methods
+        if d.get('create'):
+            if d['create'][0] == 'dice':
+                d['create'] = ('dice', check_diceware([d['create'][1]]))
+            else:
+                d['create'] = (d['create'][0], int(d['create'][1]))
+            
+            key_method, entropy = d['create'][0], d['create'][1]
+            password = methods[key_method](entropy)
+            print(f'You\'r new password with an entropy of {password[1]} is:\n{repr(password[0])}')
+
+            # set it in dictionnary
+            d['password'] = repr(password[0]).strip('"\'')
+        
+        d.pop('create')
+        d['description'] = ' '.join(d['description'])
+        if isinstance(d['password'], list):
+            d['password'] = ' '.join(d['password'])
+        if isinstance(d['user'], list):
+            d['user'] = ' '.join(d['user'])
+        return d
 
 
 class CheckMethods():
@@ -78,32 +103,35 @@ def parser(arguments: list[str]):
                                           help='create a new password, see: python3 lockpy.py create -h')
     parser_create = parser_create.add_mutually_exclusive_group()
     parser_create.add_argument('-s', '--string',
-                               type=int, metavar='Int', help='the minimal entropy for the string password ')
+                               type=int, metavar='Entropy', help='the minimal entropy for the string password ')
     parser_create.add_argument('-d', '--diceware', 
-                               nargs='+', metavar='Int, str', help='the minimal entropy for the diceware password | OPTIONAL: a second argument with the path to the list')
+                               nargs='+', metavar='Entropy, path', help='the minimal entropy for the diceware password | OPTIONAL: a second argument with the path to the list')
 
     
     parser_check = subparsers.add_parser('check', 
                                          help="check the efficacity of you'r password, see python3 lockpy.py check -h")
     parser_check = parser_check.add_mutually_exclusive_group()
     parser_check.add_argument('-c', '--calculate',
-                              type=str, metavar='Str', help='calculate entropy of a password')
+                              type=str, metavar='Password', help='calculate entropy of a password')
     parser_check.add_argument('-p', '--pawn',
-                              type=str, metavar='Str', help='check if a password has leaked on haveibeenpawned')
+                              type=str, metavar='Password', help='check if a password has leaked on haveibeenpawned')
     
 
     parser_save = subparsers.add_parser('save',
                                         help='Save a password in database')
     parser_save.add_argument('-n', '--name', 
-                            type=str, metavar='Str', help='The name of the service for the password')
+                            required=True, type=str, metavar='Service', help='The name of the service for the password')
+
     parser_save.add_argument('-p', '--password', 
-                            type=str, metavar='str', nargs='+', help='The password to save')
+                            type=str, metavar='Password', nargs='+', help='The password to save')
+    parser_save.add_argument('-u', '--user', 
+                            type=str, metavar='User', nargs='+', help='The Username to save')
     parser_save.add_argument('-c', '--create',
-                             type=str, metavar='str | dice', nargs='+', help='Create a new string or dice password to save')
-    parser_save.add_argument('-u', '--url',
-                             type=str, metavar='Str', help='The url of the password\'s site')
+                             type=str, metavar='Password type | entropy', nargs='+', help='Create a new string or dice password to save')
+    parser_save.add_argument('-l', '--link',
+                             type=str, metavar='link', help='The url of the password\'s site')
     parser_save.add_argument('-d', '--description',
-                             type=str, metavar='Str', nargs='+' ,help='A description saved in the database')
+                             type=str, metavar='Description', nargs='+' ,help='A description saved in the database')
     
     
     args = parser.parse_args(arguments)
@@ -134,10 +162,12 @@ def parser(arguments: list[str]):
             raise ValueError('A flag between password ans create should be selected')
         if args.create and len(args.create) != 2 or args.create and not args.create[1].isnumeric():
             raise ValueError('The create flag should have two arguments like method (str or dice) and the entropy (95)')
-        if int(args.create[1]) <= 0:
+        if args.create and args.create[0] != 'str' and args.create and args.create[0] != 'dice':
+            raise ValueError('The create option should take \'str\' or \'dice\' in first argument') 
+        if args.create and int(args.create[1]) <= 0:
             raise ValueError('The entropy have to be superior to zero') 
 
-        return ('save', {'name': args.name, 'password': args.password, 'url': args.url, 'description': args.description, 'create': args.create})
+        return ('save', {'name': args.name, 'user': args.user, 'password': args.password, 'url': args.link, 'description': args.description, 'create': args.create})
         
     
 def main(args):
@@ -162,28 +192,12 @@ def main(args):
             print(response_to_user)
     
     if subparse_choosed == 'save':
-        d = user_values
-        
-        # set to format's create_password functions
-        if d.get('create'):
-            if d['create'][0] == 'dice':
-                d['create'] = ('dice', check_diceware([d['create'][1]]))
-            else:
-                d['create'] = (d['create'][0], int(d['create'][1]))
-            
-            key_method, entropy = d['create'][0], d['create'][1]
-            password = methods[key_method](entropy)
-            print(f'You\'r new password with an entropy of {password[1]} is:\n{repr(password[0])}')
+        d = NewPassword.save_and_create_password(user_values, methods)
 
-            # set it in dictionnary
-            d.pop('create')
-            d['password'] = repr(password[0]).strip('"\'')
-        
-        d['description'] = ' '.join(d['description'])
         with Database('password.db') as db:
             db.add_in_db('password', f'({', '.join(f'"{d[i]}"' if d[i] else 'NULL' for i in d )})')
 
 
 if __name__ == '__main__':
-    a = 'save -n google -d A google account -u https://google.com -c dice 56'
+    a = 'save -n Service -p password -d descr -u https://service.com'
     main(sys.argv[1:])

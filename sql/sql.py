@@ -23,6 +23,7 @@ class Database():
     def create_table(self, name: str) -> None:
         sql_command = f'''CREATE TABLE {name}(\
                         name TEXT PRIMARY KEY NOT NULL,\
+                        user TEXT,\
                         password TEXT NOT NULL,\
                         url TEXT,\
                         description TEXT);'''
@@ -57,6 +58,8 @@ class Database():
         sql_command = f'DELETE FROM {table} WHERE {condition[0]}="{condition[1]}";'
         self.cursor.execute(sql_command)
         self.con.commit()
+
+
 
 if __name__ == '__main__':
     with Database('test.db') as db:
