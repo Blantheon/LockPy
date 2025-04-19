@@ -22,12 +22,10 @@ class NewPassword():
 
         return password_mod.create_password_string(entropy_user)
 
-
     @staticmethod
     def create_password_dice(entropy_path):
         entropy_user, list_path = entropy_path
         return password_mod.create_password_diceware(entropy_user, list_path)
-
 
 class CheckMethods():
     
@@ -41,11 +39,9 @@ class CheckMethods():
             print('The password is treated like a diceware password')
             return entropy.calculate_entropy_diceware(password)
 
-
     @staticmethod
     def check_pawned(password):
         return pawned.check_password_pawned(password)
-
 
 def check_diceware(arguments: list[str]) -> Tuple[int, str]:
     if len(arguments) > 2:
@@ -82,10 +78,11 @@ def parser(arguments: list[str]):
     parser_create.add_argument('-d', '--diceware', 
                                nargs='+', metavar='Int, str', help='the minimal entropy for the diceware password | OPTIONAL: a second argument with the path to the list')
 
-    
+
     parser_check = subparsers.add_parser('check', 
                                          help="check the efficacity of you'r password, see python3 lockpy.py check -h")
     parser_check = parser_check.add_mutually_exclusive_group()
+
     parser_check.add_argument('-c', '--calculate',
                               type=str, metavar='Str', help='calculate entropy of a password')
     parser_check.add_argument('-p', '--pawn',
@@ -104,11 +101,7 @@ def parser(arguments: list[str]):
                              type=str, metavar='Str', help='The url of the password\'s site')
     parser_save.add_argument('-d', '--description',
                              type=str, metavar='Str', nargs='+' ,help='A description saved in the database')
-    
 
-
-
-    
     args = parser.parse_args(arguments)
 
     # -----------------Note----------------------
