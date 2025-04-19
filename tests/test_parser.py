@@ -27,7 +27,7 @@ class TestPrimaryParsing(unittest.TestCase):
         with self.assertRaises(SystemExit) as cm, contextlib.redirect_stderr(self.f):
             parser(['Bad_Parsing'])
         self.assertEqual(cm.exception.code, 2)
-        self.assertEqual(self.f.getvalue(), f'usage: {argv[0]} [options]\n{argv[0]}: error: argument command: invalid choice: \'Bad_Parsing\' (choose from \'create\', \'check\')\n')
+        self.assertEqual(self.f.getvalue(), f'usage: {argv[0]} [options]\n{argv[0]}: error: argument command: invalid choice: \'Bad_Parsing\' (choose from \'create\', \'check\', \'save\')\n')
 
     
 
@@ -58,7 +58,7 @@ class TestCreateParsing(unittest.TestCase):
         with self.assertRaises(SystemExit) as cm, contextlib.redirect_stderr(self.f):
             parser(['create', '-d', '95', '-s', '120'])
         self.assertEqual(cm.exception.code, 2)
-        self.assertEqual(self.f.getvalue(), f'usage: {argv[0]} [options] create [-h] [-s Int | -d Int, str [Int, str ...]]\n{argv[0]} [options] create: error: argument -s/--string: not allowed with argument -d/--diceware\n')
+        self.assertEqual(self.f.getvalue(), f'usage: {argv[0]} [options] create [-h] [-s Entropy | -d Entropy, path [Entropy, path ...]]\n{argv[0]} [options] create: error: argument -s/--string: not allowed with argument -d/--diceware\n')
     
 
 class TestStrFlag(unittest.TestCase):
@@ -73,7 +73,7 @@ class TestStrFlag(unittest.TestCase):
         with self.assertRaises(SystemExit) as cm, contextlib.redirect_stderr(self.f):
             parser(['create', '-s'])
         self.assertEqual(cm.exception.code, 2)
-        self.assertEqual(self.f.getvalue(), f'usage: {argv[0]} [options] create [-h] [-s Int | -d Int, str [Int, str ...]]\n{argv[0]} [options] create: error: argument -s/--string: expected one argument\n')
+        self.assertEqual(self.f.getvalue(), f'usage: {argv[0]} [options] create [-h] [-s Entropy | -d Entropy, path [Entropy, path ...]]\n{argv[0]} [options] create: error: argument -s/--string: expected one argument\n')
     
 
     # str flag with a bad argument
@@ -81,7 +81,7 @@ class TestStrFlag(unittest.TestCase):
         with self.assertRaises(SystemExit) as cm, contextlib.redirect_stderr(self.f):
             parser(['create', '-s', 'string'])
         self.assertEqual(cm.exception.code, 2)
-        self.assertEqual(self.f.getvalue(), f'usage: {argv[0]} [options] create [-h] [-s Int | -d Int, str [Int, str ...]]\n{argv[0]} [options] create: error: argument -s/--string: invalid int value: \'string\'\n')
+        self.assertEqual(self.f.getvalue(), f'usage: {argv[0]} [options] create [-h] [-s Entropy | -d Entropy, path [Entropy, path ...]]\n{argv[0]} [options] create: error: argument -s/--string: invalid int value: \'string\'\n')
 
 
     # str flag with too many arguments
@@ -92,6 +92,13 @@ class TestStrFlag(unittest.TestCase):
         self.assertEqual(self.f.getvalue(), f'usage: {argv[0]} [options]\n{argv[0]}: error: unrecognized arguments: string\n')
     
 
+    '''    def test_str_entropy_less_90(self):
+        with self.assertWarns(UserWarning) as cm:
+            resp = parser(['create', '-s', '50'])
+        self.assertEqual(str(cm.warning), 'For a strong password we recommend using at least 90 bit of entropy')
+        self.assertEqual(resp, ('create', 'str', 50))
+
+    '''
     # str flag with 0 entropy
     def test_str_flag_zero_entropy(self):
         with self.assertRaises(ValueError) as cm:
@@ -132,7 +139,7 @@ class TestDicewareFlag(unittest.TestCase):
         with self.assertWarns(UserWarning) as cm:
             resp = parser(['create', '-d', '26'])
         self.assertEqual(str(cm.warning), 'For a strong password we recommend using at least 90 bit of entropy')
-        self.assertEqual(resp, ('dice', (26, LIST_PATH)))
+        self.assertEqual(resp, ('create', ('dice', (26, LIST_PATH))))
 
 
     # too many arguments
@@ -154,7 +161,7 @@ class TestDicewareFlag(unittest.TestCase):
         with self.assertRaises(SystemExit) as cm, contextlib.redirect_stderr(self.f):
             parser(['create', '-d'])
         self.assertEqual(cm.exception.code, 2)
-        self.assertEqual(self.f.getvalue(), f'usage: {argv[0]} [options] create [-h] [-s Int | -d Int, str [Int, str ...]]\n{argv[0]} [options] create: error: argument -d/--diceware: expected at least one argument\n')
+        self.assertEqual(self.f.getvalue(), f'usage: {argv[0]} [options] create [-h] [-s Entropy | -d Entropy, path [Entropy, path ...]]\n{argv[0]} [options] create: error: argument -d/--diceware: expected at least one argument\n')
 
 
     # dice flag with one bad arguments
@@ -167,14 +174,14 @@ class TestDicewareFlag(unittest.TestCase):
     def test_dice_bad_list(self):
         with self.assertWarns(UserWarning) as cm:
             resp = parser(['create', '-d', '95', '/home/bad_path'])
-        self.assertEqual(str(cm.warning), 'The path entered is invalid, the list that is used is the default english diceware list')
-        self.assertEqual(resp, ('dice', (95, LIST_PATH)))
+        self.assertEqual(str(cm.warning), 'The path entered is invalid, the list used is the default english diceware list')
+        self.assertEqual(resp, ('create', ('dice', (95, LIST_PATH))))
 
     def test_dice_one_good_argumen(self):
-        self.assertEqual(parser(['create', '-d', '95']), ('dice', (95, LIST_PATH)))
+        self.assertEqual(parser(['create', '-d', '95']), ('create', ('dice', (95, LIST_PATH))))
     
     def test_dice_two_good_arguments(self):
-        self.assertEqual(parser(['create', '-d', '95', LIST_PATH]), ('dice', (95, LIST_PATH)))
+        self.assertEqual(parser(['create', '-d', '95', LIST_PATH]), ('create', ('dice', (95, LIST_PATH))))
 
 
 class TestCheckCommand(unittest.TestCase):
@@ -186,29 +193,80 @@ class TestCheckCommand(unittest.TestCase):
 
 
     def test_empty_check_command(self):
-        with self.assertRaises(ValueError) as cm, contextlib.redirect_stderr(self.f):
+        with self.assertRaises(ValueError) as cm:
             parser(['check'])
         self.assertEqual(cm.exception.args[0], 'A flag should be selected when the subcommand check is used, see: python3 lockpy.py create -h')
 
 
     def test_calculate_flag(self):
-        self.assertEqual(parser(['check', '-c' 'MyStringPassword']), ('calculate', 'MyStringPassword'))
+        self.assertEqual(parser(['check', '-c' 'MyStringPassword']), ('check', ('calculate', 'MyStringPassword')))
 
 
     def test_empty_calculate_flag(self):
         with self.assertRaises(SystemExit) as cm, contextlib.redirect_stderr(self.f):
             parser(['check', '-c'])
-        self.assertEqual(self.f.getvalue(), f'usage: {argv[0]} [options] check [-h] [-c Str | -p Str]\n{argv[0]} [options] check: error: argument -c/--calculate: expected one argument\n')
+        self.assertEqual(self.f.getvalue(), f'usage: {argv[0]} [options] check [-h] [-c Password | -p Password]\n{argv[0]} [options] check: error: argument -c/--calculate: expected one argument\n')
     
 
     def test_pawn_flag(self):
-        self.assertEqual(parser(['check', '-p', 'Password']), ('pawn', 'Password'))
+        self.assertEqual(parser(['check', '-p', 'Password']), ('check', ('pawn', 'Password')))
     
 
     def test_empty_pawn_flag(self):
         with self.assertRaises(SystemExit) as cm, contextlib.redirect_stderr(self.f):
             parser(['check', '-p'])
-        self.assertEqual(self.f.getvalue(), f'usage: {argv[0]} [options] check [-h] [-c Str | -p Str]\n{argv[0]} [options] check: error: argument -p/--pawn: expected one argument\n')
+        self.assertEqual(self.f.getvalue(), f'usage: {argv[0]} [options] check [-h] [-c Password | -p Password]\n{argv[0]} [options] check: error: argument -p/--pawn: expected one argument\n')
+
+
+
+class TestSaveCommand(unittest.TestCase):
+
+
+    def __init__(self, methodName='runTest'):
+        self.f = io.StringIO()
+        super().__init__(methodName)
+
+
+    def test_emtpy_command(self):
+        with self.assertRaises(SystemExit) as cm, contextlib.redirect_stderr(self.f):
+            parser(['save'])
+        self.assertIn('-n/--name', self.f.getvalue())
+
+    
+    def test_password_and_create(self):
+        with self.assertRaises(ValueError) as cm:
+            parser(['save', '-n', 'name', '-p', 'MyPassword', '-c', 'str', '95'])
+        self.assertEqual(cm.exception.args[0], 'The password flag and the create flag can\'t be used together')
+    
+
+    def test_create_option_one_argument(self):
+        with self.assertRaises(ValueError) as cm:
+            parser(['save', '-n', 'name', '-c', 'str'])
+        self.assertEqual(cm.exception.args[0], 'The create flag should have two arguments like method (str or dice) and the entropy (95)')
+
+
+    def test_create_option_three_argument(self):
+        with self.assertRaises(ValueError) as cm:
+            parser(['save', '-n', 'name', '-c', 'str', '95', 'Bad_arg'])
+        self.assertEqual(cm.exception.args[0], 'The create flag should have two arguments like method (str or dice) and the entropy (95)')
+
+
+    def test_create_option_bad_first_argument(self):
+        with self.assertRaises(ValueError) as cm:
+            parser(['save', '-n', 'name', '-c', 'bad_arg', '95'])
+        self.assertEqual(cm.exception.args[0], 'The create option should take \'str\' or \'dice\' in first argument')
+
+
+    def test_create_option_bad_second_argument(self):
+        with self.assertRaises(ValueError) as cm:
+            parser(['save', '-n', 'name', '-c', 'str', 'NotInt'])
+        self.assertEqual(cm.exception.args[0], 'The create flag should have two arguments like method (str or dice) and the entropy (95)')
+
+
+    def test_create_good_parsing(self):
+        resp = parser(['save', '-n', 'name', '-c', 'str', '95'])
+        self.assertEqual(resp, ('save', {'create': ['str', '95'], 'description': None, 'name': 'name', 'password': None, 'url': None, 'user': None}))
+
 
 
 if __name__ == '__main__':
