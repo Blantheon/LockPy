@@ -137,7 +137,7 @@ def parser(arguments: list[str]):
     args = parser.parse_args(arguments)
 
     # -----------------Note----------------------
-    # Add password saving in SQL database / write test for it
+    # Add password retrieving in SQL database / write test for it
 
     if args.command == 'create':
         if not args.string and not args.diceware:
@@ -167,7 +167,8 @@ def parser(arguments: list[str]):
         if args.create and int(args.create[1]) <= 0:
             raise ValueError('The entropy have to be superior to zero') 
 
-        return ('save', {'name': args.name, 'user': args.user, 'password': args.password, 'url': args.link, 'description': args.description, 'create': args.create})
+        return ('save', {'name': args.name, 'user': args.user, 'password': args.password, 'url':
+                         args.link, 'description': args.description, 'create': args.create})
         
     
 def main(args):
