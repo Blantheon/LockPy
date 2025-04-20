@@ -205,7 +205,7 @@ def main(args):
     
     if subparse_choosed == 'retrieve':
         with Database('password.db') as db:
-            line = db.select_in_db(user_values)
+            line = db.select_in_db('password', user_values)
             d = {'Service': line[0], 'User': line[1], 'Password': line[2], 'Url': line[3], 'Description': line[4]}
             print('\n'.join(f'{k}: {d[k]}' for k in d if d[k]))
 
