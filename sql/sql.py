@@ -51,8 +51,8 @@ class Database():
             self.add_in_db('password', values)
         
 
-    def select_in_db(self, name: str) -> str:
-        sql_command = f'SELECT * FROM password where name="{name}"'
+    def select_in_db(self, table: str, name: str) -> str:
+        sql_command = f'SELECT * FROM {table} where name="{name}"'
         self.cursor.execute(sql_command)
         line = self.cursor.fetchall()
         if not line:
@@ -76,7 +76,7 @@ class Database():
 
 if __name__ == '__main__':
     with Database('test.db') as db:
-        pass
+        db.add_in_db()
 
 """
 # SQL query to view different table
