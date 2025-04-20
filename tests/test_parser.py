@@ -27,7 +27,7 @@ class TestPrimaryParsing(unittest.TestCase):
         with self.assertRaises(SystemExit) as cm, contextlib.redirect_stderr(self.f):
             parser(['Bad_Parsing'])
         self.assertEqual(cm.exception.code, 2)
-        self.assertEqual(self.f.getvalue(), f'usage: {argv[0]} [options]\n{argv[0]}: error: argument command: invalid choice: \'Bad_Parsing\' (choose from \'create\', \'check\', \'save\')\n')
+        self.assertEqual(self.f.getvalue(), f'usage: {argv[0]} [options]\n{argv[0]}: error: argument command: invalid choice: \'Bad_Parsing\' (choose from \'create\', \'check\', \'save\', \'retrieve\')\n')
 
     
 
@@ -266,6 +266,30 @@ class TestSaveCommand(unittest.TestCase):
     def test_create_good_parsing(self):
         resp = parser(['save', '-n', 'name', '-c', 'str', '95'])
         self.assertEqual(resp, ('save', {'create': ['str', '95'], 'description': None, 'name': 'name', 'password': None, 'url': None, 'user': None}))
+
+
+class TestRetrieveCommand(unittest.TestCase):
+    
+    def __init__(self, methodName = "runTest"):
+        self.f = io.StringIO()
+        super().__init__(methodName)
+
+    
+    def test_emtpy_command(self):
+        with self.assertRaises(SystemExit) as cm, contextlib.redirect_stderr(self.f):
+            parser(['retrieve'])
+        self.assertEqual(self.f.getvalue(), f'usage: {argv[0]} [options] retrieve [-h] Service\n{argv[0]} [options] retrieve: error: the following arguments are required: Service\n')
+
+    
+    def test_with_one_argument(self):
+        resp = parser(['retrieve', 'google'])
+        self.assertEqual(resp, ('retrieve', 'google'))
+
+    
+    def test_with_two_arguments(self):
+        with self.assertRaises(SystemExit) as cm, contextlib.redirect_stderr(self.f):
+            parser(['retrieve', 'google', 'bad'])
+        self.assertEqual(self.f.getvalue(), f'usage: {argv[0]} [options]\n{argv[0]}: error: unrecognized arguments: bad\n')
 
 
 
