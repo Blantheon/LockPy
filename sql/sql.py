@@ -51,6 +51,16 @@ class Database():
             self.add_in_db('password', values)
         
 
+    def select_in_db(self, name: str) -> str:
+        sql_command = f'SELECT * FROM password where name="{name}"'
+        self.cursor.execute(sql_command)
+        line = self.cursor.fetchall()
+        if not line:
+            raise NameError('The service entered doesn\'t exist')
+        
+        return line[0]
+
+
     def update_db(self, table: str, column: str, new_value: str, condition: list[str, str]) -> None:
         sql_command = f'UPDATE {table} SET {column}="{new_value}" WHERE {condition[0]}="{condition[1]}";'
         self.cursor.execute(sql_command)

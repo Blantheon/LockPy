@@ -46,7 +46,8 @@ class NewPassword():
             d['password'] = repr(password[0]).strip('"\'')
         
         d.pop('create')
-        d['description'] = ' '.join(d['description'])
+        if isinstance(d['description'], list):
+            d['description'] = ' '.join(d['description'])
         if isinstance(d['password'], list):
             d['password'] = ' '.join(d['password'])
         if isinstance(d['user'], list):
@@ -94,7 +95,7 @@ def check_diceware(arguments: list[str]) -> Tuple[int, str]:
     return (int(arguments[0]), '/home/' + getuser() + '/Desktop/lockpy/lists/en.txt')
 
 
-def parser(arguments: list[str]):
+def parser(arguments: list[str]) -> tuple[str, tuple[str]]:
     parser = argparse.ArgumentParser(usage="%(prog)s [options]")
     parser.add_argument('--version', action='version', version='LockPy 1.0')
     subparsers = parser.add_subparsers(required=True, dest='command')
@@ -106,7 +107,6 @@ def parser(arguments: list[str]):
                                type=int, metavar='Entropy', help='the minimal entropy for the string password ')
     parser_create.add_argument('-d', '--diceware', 
                                nargs='+', metavar='Entropy, path', help='the minimal entropy for the diceware password | OPTIONAL: a second argument with the path to the list')
-
     
     parser_check = subparsers.add_parser('check', 
                                          help="check the efficacity of you'r password, see python3 lockpy.py check -h")
@@ -116,12 +116,10 @@ def parser(arguments: list[str]):
     parser_check.add_argument('-p', '--pawn',
                               type=str, metavar='Password', help='check if a password has leaked on haveibeenpawned')
     
-
     parser_save = subparsers.add_parser('save',
                                         help='Save a password in database')
     parser_save.add_argument('-n', '--name', 
                             required=True, type=str, metavar='Service', help='The name of the service for the password')
-
     parser_save.add_argument('-p', '--password', 
                             type=str, metavar='Password', nargs='+', help='The password to save')
     parser_save.add_argument('-u', '--user', 
@@ -132,12 +130,16 @@ def parser(arguments: list[str]):
                              type=str, metavar='link', help='The url of the password\'s site')
     parser_save.add_argument('-d', '--description',
                              type=str, metavar='Description', nargs='+' ,help='A description saved in the database')
-    
-    
+
+    parser_take = subparsers.add_parser('retrieve',
+                                        help='Pick a password in the database')
+    parser_take.add_argument('name',
+                             type=str, metavar='Service', help='Retrieve informations of the service\'s name in the database')
+
     args = parser.parse_args(arguments)
 
     # -----------------Note----------------------
-    # Add password saving in SQL database / write test for it
+    # Add password retrieving in SQL database / write test for it
 
     if args.command == 'create':
         if not args.string and not args.diceware:
@@ -170,6 +172,9 @@ def parser(arguments: list[str]):
         return ('save', {'name': args.name, 'user': args.user, 'password': args.password, 'url'
         '': args.link, 'description': args.description, 'create': args.create})
         
+    if args.command == 'retrieve':
+        return ('retrieve', args.name)
+
     
 def main(args):
 
@@ -197,8 +202,15 @@ def main(args):
 
         with Database('password.db') as db:
             db.add_in_db('password', f'({', '.join(f'"{d[i]}"' if d[i] else 'NULL' for i in d )})')
+    
+    if subparse_choosed == 'retrieve':
+        with Database('password.db') as db:
+            line = db.select_in_db(user_values)
+            d = {'Service': line[0], 'User': line[1], 'Password': line[2], 'Url': line[3], 'Description': line[4]}
+            print('\n'.join(f'{k}: {d[k]}' for k in d if d[k]))
+
 
 
 if __name__ == '__main__':
-    a = 'save -n Service -p password -d descr -u https://service.com'
+    a = 'retrieve google'
     main(sys.argv[1:])

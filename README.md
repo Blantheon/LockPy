@@ -18,11 +18,11 @@ Welcome to LockPy, a secure and efficient tool for creating strong passwords wit
 
 I'm actively working on improving this project. Here are some planned features:
 
-- 🔄 Firefox addon auto-fill and retrieval functionality
+- 🔒 Secure password storage with encryption
 
 - 👻 Deamon to keep the password in RAM
 
-- 🔒 Secure password storage with encryption
+- 🔄 Firefox addon auto-fill and retrieval functionality
 
 #### Installation
 
