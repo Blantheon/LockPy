@@ -1,4 +1,5 @@
 import sqlite3
+from typing import Generator
 
 class Database():
 
@@ -31,12 +32,6 @@ class Database():
                         url TEXT,\
                         description TEXT);'''
         self.cursor.execute(sql_command)
-        
-
-    def select_all(self, table: str):
-        self.cursor.execute(f'SELECT * FROM {table}')
-        all_db = self.cursor.fetchall()
-        return all_db
 
 
     def add_in_db(self, table: str, values: str) -> None:
@@ -50,14 +45,17 @@ class Database():
             self.add_in_db('password', values)
         
 
-    def select_in_db(self, table: str, name: str) -> str:
-        sql_command = f'SELECT * FROM {table} where name="{name}"'
+    def select_in_db(self, table: str, name: str) -> Generator[str, str, None]:
+        sql_command = f'SELECT * FROM {table}'
+        if name != 'all':
+            sql_command +=  f' WHERE name="{name}"'
+        
         self.cursor.execute(sql_command)
         line = self.cursor.fetchall()
         if not line:
             raise NameError('The service entered doesn\'t exist')
         
-        return [line[0]]
+        yield line
 
 
     def update_db(self, table: str, column: str, new_value: str, condition: list[str, str]) -> None:

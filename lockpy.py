@@ -144,10 +144,19 @@ def parser(arguments: list[str]) -> tuple[str, tuple[str]]:
     parser_delete.add_argument('name',
                                type=str, metavar='Name', help='Delete the raw in the database with the name entered')
 
+    parser_update = subparsers.add_parser('update',
+                                          help='Update the column in the database with the name entered')
+    parser_update.add_argument('-n', '--name', 
+                               type=str, metavar='Name ', required=True, help='The name of the raw')
+    parser_update.add_argument('-c', '--column',
+                               type=str, metavar='Column', required=True, help='The column (name, password, user, ...) to be updated')
+    parser_update.add_argument('-nv', '--new-value',
+                               type=str, nargs='+', metavar='New Value', required=True, help='The new value to set in the column')
+
     args = parser.parse_args(arguments)
 
     # -----------------Note----------------------
-    # Add password deleting in SQL database / write test for it
+    # Add password updating in SQL database / write test for it
     # Write tests for the Database class
 
     if args.command == 'create':
@@ -192,6 +201,13 @@ def parser(arguments: list[str]) -> tuple[str, tuple[str]]:
     if args.command == 'delete':
         return ('delete', args.name)
     
+    if args.command == 'update':
+        if len(args.new_value) > 1 and args.column not in ['description', 'password']:
+            raise ValueError('The only columns that accept multiple words are "description" and "password"')
+
+        return ('update', {'name': args.name, 'column': args.column, 'value': args.new_value})
+
+
 def main(args):
 
     subparse_choosed, user_values = parser(args)
@@ -220,22 +236,20 @@ def main(args):
             db.add_in_db('password', f'({', '.join(f'"{d[i]}"' if d[i] else 'NULL' for i in d )})')
     
     if subparse_choosed == 'retrieve':
-        if user_values != 'all':
-            with Database('password.db') as db:
-                lines = db.select_in_db('password', user_values)
-        else:
-            with Database('password.db') as db:
-                lines = db.select_all('password')
-        
-        for line in lines:
-            d = {'Service': line[0], 'User': line[1], 'Password': line[2], 'Url': line[3], 'Description': line[4]}
-            print('-' * 28)
-            print('\n'.join(f'{k}: {d[k]}' for k in d if d[k]))
+        with Database('password.db') as db:
+            for lines in db.select_in_db('password', user_values):
+                for word in lines:
+                    d = {'Service': word[0], 'User': word[1], 'Password': word[2], 'Url': word[3], 'Description': word[4]}
+                    print('-' * 28)
+                    print('\n'.join(f'{k}: {d[k]}' for k in d if d[k]))
 
     if subparse_choosed == 'delete':
         with Database('password.db') as db:
             db.delete_in_db('password', user_values)
 
+
+    if subparse_choosed == 'update':
+        print(user_values)
 
 if __name__ == '__main__':
     a = 'retrieve google'
