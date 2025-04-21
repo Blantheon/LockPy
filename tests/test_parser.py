@@ -27,7 +27,7 @@ class TestPrimaryParsing(unittest.TestCase):
         with self.assertRaises(SystemExit) as cm, contextlib.redirect_stderr(self.f):
             parser(['Bad_Parsing'])
         self.assertEqual(cm.exception.code, 2)
-        self.assertEqual(self.f.getvalue(), f'usage: {argv[0]} [options]\n{argv[0]}: error: argument command: invalid choice: \'Bad_Parsing\' (choose from \'create\', \'check\', \'save\', \'retrieve\')\n')
+        self.assertEqual(self.f.getvalue(), f'usage: {argv[0]} [options]\n{argv[0]}: error: argument command: invalid choice: \'Bad_Parsing\' (choose from \'create\', \'check\', \'save\', \'retrieve\', \'delete\')\n')
 
     
 
@@ -276,21 +276,33 @@ class TestRetrieveCommand(unittest.TestCase):
 
     
     def test_emtpy_command(self):
-        with self.assertRaises(SystemExit) as cm, contextlib.redirect_stderr(self.f):
+        with self.assertRaises(ValueError) as cm:
             parser(['retrieve'])
-        self.assertEqual(self.f.getvalue(), f'usage: {argv[0]} [options] retrieve [-h] Service\n{argv[0]} [options] retrieve: error: the following arguments are required: Service\n')
-
+        self.assertEqual(cm.exception.args[0], 'The retrieve subcommand should take a valid flag (-n or -a)')
     
     def test_with_one_argument(self):
-        resp = parser(['retrieve', 'google'])
+        resp = parser(['retrieve', '-n', 'google'])
         self.assertEqual(resp, ('retrieve', 'google'))
 
     
     def test_with_two_arguments(self):
         with self.assertRaises(SystemExit) as cm, contextlib.redirect_stderr(self.f):
-            parser(['retrieve', 'google', 'bad'])
+            parser(['retrieve', '-n', 'google', 'bad'])
         self.assertEqual(self.f.getvalue(), f'usage: {argv[0]} [options]\n{argv[0]}: error: unrecognized arguments: bad\n')
 
+
+    def test_with_a_command(self):
+        resp = parser(['retrieve', '-a'])
+        self.assertEqual(resp, ('retrieve', 'all'))
+
+
+class TestsDeleteCommand(unittest.TestCase):
+
+    def test_empty_command(self):
+        var = io.StringIO()
+        with self.assertRaises(SystemExit) as cm,contextlib.redirect_stderr(var):
+            parser(['delete'])
+        self.assertEqual(var.getvalue(), f'usage: {argv[0]} [options] delete [-h] Name\n{argv[0]} [options] delete: error: the following arguments are required: Name\n')
 
 
 if __name__ == '__main__':

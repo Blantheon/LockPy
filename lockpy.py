@@ -139,10 +139,16 @@ def parser(arguments: list[str]) -> tuple[str, tuple[str]]:
     parser_take.add_argument('-a', '--all',
                              action='store_true', help='Retrieve all the database')
 
+    parser_delete = subparsers.add_parser('delete',
+                                           help='Delete an entry in the database')
+    parser_delete.add_argument('name',
+                               type=str, metavar='Name', help='Delete the raw in the database with the name entered')
+
     args = parser.parse_args(arguments)
 
     # -----------------Note----------------------
-    # Add password retrieving in SQL database / write test for it
+    # Add password deleting in SQL database / write test for it
+    # Write tests for the Database class
 
     if args.command == 'create':
         if not args.string and not args.diceware:
@@ -182,6 +188,9 @@ def parser(arguments: list[str]) -> tuple[str, tuple[str]]:
             return ('retrieve', 'all')
         else:
             raise ValueError('The retrieve subcommand should take a valid flag (-n or -a)')
+        
+    if args.command == 'delete':
+        return ('delete', args.name)
     
 def main(args):
 
@@ -223,6 +232,9 @@ def main(args):
             print('-' * 28)
             print('\n'.join(f'{k}: {d[k]}' for k in d if d[k]))
 
+    if subparse_choosed == 'delete':
+        with Database('password.db') as db:
+            db.delete_in_db('password', user_values)
 
 
 if __name__ == '__main__':

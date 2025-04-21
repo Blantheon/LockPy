@@ -66,8 +66,8 @@ class Database():
         self.con.commit()
 
     
-    def delete_in_db(self, table: str, condition: list[str, str]) -> None:
-        sql_command = f'DELETE FROM {table} WHERE {condition[0]}="{condition[1]}";'
+    def delete_in_db(self, table: str, name: str) -> None:
+        sql_command = f'DELETE FROM {table} WHERE name="{name}";'
         self.cursor.execute(sql_command)
         self.con.commit()
 
