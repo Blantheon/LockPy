@@ -133,8 +133,11 @@ def parser(arguments: list[str]) -> tuple[str, tuple[str]]:
 
     parser_take = subparsers.add_parser('retrieve',
                                         help='Pick a password in the database')
-    parser_take.add_argument('name',
+    parser_take = parser_take.add_mutually_exclusive_group()
+    parser_take.add_argument('-n', '--name',
                              type=str, metavar='Service', help='Retrieve informations of the service\'s name in the database')
+    parser_take.add_argument('-a', '--all',
+                             action='store_true', help='Retrieve all the database')
 
     args = parser.parse_args(arguments)
 
@@ -173,8 +176,12 @@ def parser(arguments: list[str]) -> tuple[str, tuple[str]]:
         '': args.link, 'description': args.description, 'create': args.create})
         
     if args.command == 'retrieve':
-        return ('retrieve', args.name)
-
+        if args.name:
+            return ('retrieve', args.name)
+        elif args.all:
+            return ('retrieve', 'all')
+        else:
+            raise ValueError('The retrieve subcommand should take a valid flag (-n or -a)')
     
 def main(args):
 
@@ -204,9 +211,16 @@ def main(args):
             db.add_in_db('password', f'({', '.join(f'"{d[i]}"' if d[i] else 'NULL' for i in d )})')
     
     if subparse_choosed == 'retrieve':
-        with Database('password.db') as db:
-            line = db.select_in_db('password', user_values)
+        if user_values != 'all':
+            with Database('password.db') as db:
+                lines = db.select_in_db('password', user_values)
+        else:
+            with Database('password.db') as db:
+                lines = db.select_all('password')
+        
+        for line in lines:
             d = {'Service': line[0], 'User': line[1], 'Password': line[2], 'Url': line[3], 'Description': line[4]}
+            print('-' * 28)
             print('\n'.join(f'{k}: {d[k]}' for k in d if d[k]))
 
 

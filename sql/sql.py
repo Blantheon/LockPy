@@ -33,11 +33,10 @@ class Database():
         self.cursor.execute(sql_command)
         
 
-    def select_all(self, table: str) -> None:
+    def select_all(self, table: str):
         self.cursor.execute(f'SELECT * FROM {table}')
         all_db = self.cursor.fetchall()
-        for line in all_db: 
-            print(line)
+        return all_db
 
 
     def add_in_db(self, table: str, values: str) -> None:
@@ -58,7 +57,7 @@ class Database():
         if not line:
             raise NameError('The service entered doesn\'t exist')
         
-        return line[0]
+        return [line[0]]
 
 
     def update_db(self, table: str, column: str, new_value: str, condition: list[str, str]) -> None:
