@@ -84,6 +84,7 @@ def check_diceware(arguments: list[str]) -> Tuple[int, str]:
         warnings.warn('For a strong password we recommend using at least 90 bit of entropy')
         print('\n')
 
+
     if len(arguments) == 2:
         # check location of the flag lists with os module
         if os.path.isfile(arguments[1]):
@@ -208,7 +209,9 @@ def parser(arguments: list[str]) -> tuple[str, tuple[str]]:
         return ('update', {'name': args.name, 'column': args.column, 'value': args.new_value})
 
 
+
 def main(args):
+
 
     subparse_choosed, user_values = parser(args)
     methods = {'str': NewPassword.create_password_str,
@@ -248,8 +251,10 @@ def main(args):
             db.delete_in_db('password', user_values)
 
 
+
     if subparse_choosed == 'update':
         print(user_values)
+
 
 if __name__ == '__main__':
     a = 'retrieve google'
