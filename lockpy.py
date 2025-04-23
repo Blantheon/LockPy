@@ -10,7 +10,7 @@ import modules.check_modules.ibeenpwned as pawned
 from sql.sql import Database
 
 
-# These class are used to do verification on user input and call function after that  
+# These class are used to do verification on user input and call function after that
 class NewPassword():
 
     @staticmethod
@@ -73,6 +73,16 @@ class CheckMethods():
         return pawned.check_password_pawned(password)
 
 
+def construct_message(key_method: str, user: str, response: str):
+    if key_method in ['str', 'dice']:
+        return f'The new password with an entropy of {response[1]} is:\n{repr(response[0])}'
+    elif key_method == 'calculate':
+        return f'The entropy of the password {user} is: {response}'
+    else:
+        # the message is directly returned by the function
+        return response
+
+
 def check_diceware(arguments: list[str]) -> Tuple[int, str]:
     if len(arguments) > 2:
         raise ValueError(f'The diceware flag take only one or two arguments in the following: int, str. See: python3 lockpy.py create -h')
@@ -94,6 +104,57 @@ def check_diceware(arguments: list[str]) -> Tuple[int, str]:
             print('\n')
 
     return (int(arguments[0]), '/home/' + getuser() + '/Desktop/lockpy/lists/en.txt')
+
+
+def check_parsing(args: argparse.Namespace) -> Tuple[str, ...]:
+    if args.command == 'create':
+        if not args.string and not args.diceware:
+            raise ValueError(f'A flag with an entropy greater than 0 should be selected when the subcommand create is used, see: python3 lockpy.py create -h')
+        elif args.diceware:
+            return ('create',('dice', check_diceware(args.diceware)))
+        else:
+            return ('create', ('str', args.string))
+    
+    if args.command == 'check':
+        if args.calculate:
+            return ('check', ('calculate', args.calculate))
+        elif args.pawn:
+            return ('check', ('pawn', args.pawn))
+        else:
+            raise ValueError('A flag should be selected when the subcommand check is used, see: python3 lockpy.py create -h')
+    
+    if args.command == 'save':
+        if args.password and args.create:
+            raise ValueError('The password flag and the create flag can\'t be used together')
+        if not args.password and not args.create:
+            raise ValueError('A flag between password ans create should be selected')
+        if args.create and len(args.create) != 2 or args.create and not args.create[1].isnumeric():
+            raise ValueError('The create flag should have two arguments like method (str or dice) and the entropy (95)')
+        if args.create and args.create[0] != 'str' and args.create and args.create[0] != 'dice':
+            raise ValueError('The create option should take \'str\' or \'dice\' in first argument') 
+        if args.create and int(args.create[1]) <= 0:
+            raise ValueError('The entropy have to be superior to zero') 
+
+        return ('save', {'name': args.name, 'user': args.user, 'password': args.password, 'url'
+        '': args.link, 'description': args.description, 'create': args.create})
+        
+    if args.command == 'retrieve':
+        if args.name:
+            return ('retrieve', args.name)
+        elif args.all:
+            return ('retrieve', 'all')
+        else:
+            raise ValueError('The retrieve subcommand should take a valid flag (-n or -a)')
+        
+    if args.command == 'delete':
+        return ('delete', args.name)
+    
+    if args.command == 'update':
+        column = args.column.strip().lower()
+        if len(args.new_value) > 1 and column not in ['description', 'password']:
+            raise ValueError('The only columns that accept multiple words are "description" and "password"')
+
+        return ('update', {'name': args.name, 'column': column, 'value': ' '.join(args.new_value)})
 
 
 def parser(arguments: list[str]) -> tuple[str, tuple[str]]:
@@ -155,107 +216,36 @@ def parser(arguments: list[str]) -> tuple[str, tuple[str]]:
                                type=str, nargs='+', metavar='New Value', required=True, help='The new value to set in the column')
 
     args = parser.parse_args(arguments)
+    return check_parsing(args)
 
-    # -----------------Note----------------------
-    # Add password updating in SQL database / write test for it
-    # Write tests for the Database class
-
-    if args.command == 'create':
-        if not args.string and not args.diceware:
-            raise ValueError(f'A flag with an entropy greater than 0 should be selected when the subcommand create is used, see: python3 lockpy.py create -h')
-        elif args.diceware:
-            return ('create',('dice', check_diceware(args.diceware)))
-        else:
-            return ('create', ('str', args.string))
-    
-    if args.command == 'check':
-        if args.calculate:
-            return ('check', ('calculate', args.calculate))
-        elif args.pawn:
-            return ('check', ('pawn', args.pawn))
-        else:
-            raise ValueError('A flag should be selected when the subcommand check is used, see: python3 lockpy.py create -h')
-    
-    if args.command == 'save':
-        if args.password and args.create:
-            raise ValueError('The password flag and the create flag can\'t be used together')
-        if not args.password and not args.create:
-            raise ValueError('A flag between password ans create should be selected')
-        if args.create and len(args.create) != 2 or args.create and not args.create[1].isnumeric():
-            raise ValueError('The create flag should have two arguments like method (str or dice) and the entropy (95)')
-        if args.create and args.create[0] != 'str' and args.create and args.create[0] != 'dice':
-            raise ValueError('The create option should take \'str\' or \'dice\' in first argument') 
-        if args.create and int(args.create[1]) <= 0:
-            raise ValueError('The entropy have to be superior to zero') 
-
-        return ('save', {'name': args.name, 'user': args.user, 'password': args.password, 'url'
-        '': args.link, 'description': args.description, 'create': args.create})
-        
-    if args.command == 'retrieve':
-        if args.name:
-            return ('retrieve', args.name)
-        elif args.all:
-            return ('retrieve', 'all')
-        else:
-            raise ValueError('The retrieve subcommand should take a valid flag (-n or -a)')
-        
-    if args.command == 'delete':
-        return ('delete', args.name)
-    
-    if args.command == 'update':
-        column = args.column.strip().lower()
-        if len(args.new_value) > 1 and column not in ['description', 'password']:
-            raise ValueError('The only columns that accept multiple words are "description" and "password"')
-
-        return ('update', {'name': args.name, 'column': column, 'value': ' '.join(args.new_value)})
-
-
+# -----------------Note----------------------
+# Add password updating in SQL database / write test for it
+# Write tests for the Database class
 
 def main(args):
-
-
     subparse_choosed, user_values = parser(args)
     methods = {'str': NewPassword.create_password_str,
             'dice': NewPassword.create_password_dice,
             'calculate': CheckMethods.calculate_password_entropy,
-            'pawn': CheckMethods.check_pawned}
+            'pawn': CheckMethods.check_pawned,
+            'retrieve': lambda s: s.select_in_db,
+            'delete': lambda s: s.delete_in_db,
+            'update': lambda s: s.update_db}
 
     if subparse_choosed in ['create', 'check']:
         key_method, user_input = user_values       
         response_to_user = methods[key_method](user_input)
-
-
-        if key_method in ['str', 'dice']:
-            print(f'The new password with an entropy of {response_to_user[1]} is:\n{repr(response_to_user[0])}')
-        elif key_method == 'calculate':
-            print(f'The entropy of the password {user_input} is: {response_to_user}')
-        else:
-            # the message is directly returned by the function
-            print(response_to_user)
+        print(construct_message(key_method, user_input, response_to_user))
     
     if subparse_choosed == 'save':
         d = NewPassword.save_and_create_password(user_values, methods)
 
         with Database('password.db') as db:
-            db.add_in_db('password', f'({', '.join(f'"{d[i]}"' if d[i] else 'NULL' for i in d )})')
+            db.add_in_db(f'({', '.join(f'"{d[i]}"' if d[i] else 'NULL' for i in d )})')
     
-    if subparse_choosed == 'retrieve':
+    if subparse_choosed in ['retrieve', 'delete', 'update']:
         with Database('password.db') as db:
-            for lines in db.select_in_db('password', user_values):
-                for word in lines:
-                    d = {'Service': word[0], 'User': word[1], 'Password': word[2], 'Url': word[3], 'Description': word[4]}
-                    print('-' * 28)
-                    print('\n'.join(f'{k}: {d[k]}' for k in d if d[k]))
-
-    if subparse_choosed == 'delete':
-        with Database('password.db') as db:
-            db.delete_in_db('password', user_values)
-
-
-
-    if subparse_choosed == 'update':
-        with Database('password.db') as db:
-            db.update_db('password', user_values['column'], user_values['value'], user_values['name'])
+            methods[subparse_choosed](db)(user_values)
 
 
 if __name__ == '__main__':

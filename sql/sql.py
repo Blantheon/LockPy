@@ -34,8 +34,8 @@ class Database():
         self.cursor.execute(sql_command)
 
 
-    def add_in_db(self, table: str, values: str) -> None:
-        sql_command = f'INSERT INTO {table} VALUES {values};'
+    def add_in_db(self, values: str) -> None:
+        sql_command = f'INSERT INTO password VALUES {values};'
         try:
             self.cursor.execute(sql_command)
             self.con.commit()
@@ -45,27 +45,29 @@ class Database():
             self.add_in_db('password', values)
         
 
-    def select_in_db(self, table: str, name: str) -> Generator[str, str, None]:
-        sql_command = f'SELECT * FROM {table}'
+    def select_in_db(self, name: str) -> None:
+        sql_command = f'SELECT * FROM password'
         if name != 'all':
             sql_command +=  f' WHERE name="{name}"'
-        
         self.cursor.execute(sql_command)
-        line = self.cursor.fetchall()
-        if not line:
+        lines = self.cursor.fetchall()
+        if not lines:
             raise NameError('The service entered doesn\'t exist')
-        
-        yield line
+        for word in lines:
+            d = {'Service': word[0], 'User': word[1], 'Password': word[2], 'Url': word[3], 'Description': word[4]}
+            print('-' * 28)
+            print('\n'.join(f'{k}: {d[k]}' for k in d if d[k]))
 
 
-    def update_db(self, table: str, column: str, new_value: str, name: str) -> None:
-        sql_command = f'UPDATE {table} SET {column}="{new_value}" WHERE name="{name}";'
+    def update_db(self, values: dict[str]) -> None:
+        name, column, new_value = values['name'], values['column'], values['value']
+        sql_command = f'UPDATE password SET {column}="{new_value}" WHERE name="{name}";'
         self.cursor.execute(sql_command)
         self.con.commit()
 
     
-    def delete_in_db(self, table: str, name: str) -> None:
-        sql_command = f'DELETE FROM {table} WHERE name="{name}";'
+    def delete_in_db(self, name: str) -> None:
+        sql_command = f'DELETE FROM password WHERE name="{name}";'
         self.cursor.execute(sql_command)
         self.con.commit()
 
