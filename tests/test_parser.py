@@ -92,13 +92,6 @@ class TestStrFlag(unittest.TestCase):
         self.assertEqual(self.f.getvalue(), f'usage: {argv[0]} [options]\n{argv[0]}: error: unrecognized arguments: string\n')
     
 
-    '''    def test_str_entropy_less_90(self):
-        with self.assertWarns(UserWarning) as cm:
-            resp = parser(['create', '-s', '50'])
-        self.assertEqual(str(cm.warning), 'For a strong password we recommend using at least 90 bit of entropy')
-        self.assertEqual(resp, ('create', 'str', 50))
-
-    '''
     # str flag with 0 entropy
     def test_str_flag_zero_entropy(self):
         with self.assertRaises(ValueError) as cm:
@@ -303,6 +296,25 @@ class TestsDeleteCommand(unittest.TestCase):
         with self.assertRaises(SystemExit) as cm,contextlib.redirect_stderr(var):
             parser(['delete'])
         self.assertEqual(var.getvalue(), f'usage: {argv[0]} [options] delete [-h] Name\n{argv[0]} [options] delete: error: the following arguments are required: Name\n')
+
+
+class TestUpdateCommand(unittest.TestCase):
+
+    def test_bad_name(self):
+        self.assertEqual(parser(['update', '-n', 'Name', '-c', 'Description', '-nv', 'New_Value']),
+                         ('update', {'name': 'Name', 'column': 'description', 'value': 'New_Value'}))
+        
+    def test_bad_column(self):
+        self.assertEqual(parser(['update', '-n', 'Name', '-c', 'Bad_column', '-nv', 'New_Value']), 
+                         ('update', {'name': 'Name', 'column': 'bad_column', 'value': 'New_Value'}))
+
+    def test_too_many_arguments(self):
+        with self.assertRaises(ValueError) as cm:
+            parser(['update', '-n', 'Name', '-c', 'name', '-nv', 'New', 'value'])
+        self.assertEqual(cm.exception.args[0], 'The only columns that accept multiple words are "description" and "password"')
+
+
+
 
 
 if __name__ == '__main__':

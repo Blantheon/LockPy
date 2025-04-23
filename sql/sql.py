@@ -58,8 +58,8 @@ class Database():
         yield line
 
 
-    def update_db(self, table: str, column: str, new_value: str, condition: list[str, str]) -> None:
-        sql_command = f'UPDATE {table} SET {column}="{new_value}" WHERE {condition[0]}="{condition[1]}";'
+    def update_db(self, table: str, column: str, new_value: str, name: str) -> None:
+        sql_command = f'UPDATE {table} SET {column}="{new_value}" WHERE name="{name}";'
         self.cursor.execute(sql_command)
         self.con.commit()
 

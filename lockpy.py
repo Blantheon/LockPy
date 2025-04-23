@@ -203,10 +203,11 @@ def parser(arguments: list[str]) -> tuple[str, tuple[str]]:
         return ('delete', args.name)
     
     if args.command == 'update':
-        if len(args.new_value) > 1 and args.column not in ['description', 'password']:
+        column = args.column.strip().lower()
+        if len(args.new_value) > 1 and column not in ['description', 'password']:
             raise ValueError('The only columns that accept multiple words are "description" and "password"')
 
-        return ('update', {'name': args.name, 'column': args.column, 'value': args.new_value})
+        return ('update', {'name': args.name, 'column': column, 'value': ' '.join(args.new_value)})
 
 
 
@@ -253,7 +254,8 @@ def main(args):
 
 
     if subparse_choosed == 'update':
-        print(user_values)
+        with Database('password.db') as db:
+            db.update_db('password', user_values['column'], user_values['value'], user_values['name'])
 
 
 if __name__ == '__main__':
