@@ -1,17 +1,15 @@
 import sqlite3
 from typing import Generator
+from getpass import getuser
 
 class Database():
 
     def __init__(self, path: str) -> None:
-        self.path = 'sql/' + path
-        self.table = None
+        self.path = '/home/' + getuser() + '/Desktop/lockpy/sql/' + path
         self.connect()
 
 
     def __enter__(self):
-        self.con = sqlite3.connect(self.path)
-        self.cursor = self.con.cursor()
         return self
 
 
@@ -22,10 +20,15 @@ class Database():
     def connect(self) -> None:
         self.con = sqlite3.connect(self.path)
         self.cursor = self.con.cursor()
+        # check if the table exist
+        sql_command = "SELECT name FROM sqlite_master WHERE type='table' AND name='password';"
+        self.cursor.execute(sql_command)
+        response = self.cursor.fetchall()
+        if not response:
+            self.create_table()
 
-
-    def create_table(self, name: str) -> None:
-        sql_command = f'''CREATE TABLE {name}(\
+    def create_table(self) -> None:
+        sql_command = f'''CREATE TABLE password(\
                         name TEXT PRIMARY KEY NOT NULL,\
                         user TEXT,\
                         password TEXT NOT NULL,\
@@ -36,13 +39,8 @@ class Database():
 
     def add_in_db(self, values: str) -> None:
         sql_command = f'INSERT INTO password VALUES {values};'
-        try:
-            self.cursor.execute(sql_command)
-            self.con.commit()
-            # if the table doesn't exist
-        except sqlite3.OperationalError:
-            self.create_table('password')
-            self.add_in_db('password', values)
+        self.cursor.execute(sql_command)
+        self.con.commit()
         
 
     def select_in_db(self, name: str) -> None:
@@ -52,7 +50,7 @@ class Database():
         self.cursor.execute(sql_command)
         lines = self.cursor.fetchall()
         if not lines:
-            raise NameError('The service entered doesn\'t exist')
+            raise ValueError('The service entered doesn\'t exist or the table is empty')
         for word in lines:
             d = {'Service': word[0], 'User': word[1], 'Password': word[2], 'Url': word[3], 'Description': word[4]}
             print('-' * 28)
