@@ -13,15 +13,16 @@ class Encryption():
 
         self.f = Fernet(self.key)
 
+
     def new_key(self, password: str = None):
-        self.key = Fernet.generate_key()
+        self.key: bytes = Fernet.generate_key()
         if not password:
             password = input('Enter a password for the database: ')
 
-        # TO ADD: write a crypted key
+        # TO ADD: encrypt the key with AES-GCM with a derived key by PBKDF2 based on the user password
         salt: bytes = urandom(16)
         kdf = PBKDF2HMAC(hashes.SHA256(), 32, salt, 1_000_000)
-        print(kdf.derive(b'password'))
+        key: bytes = kdf.derive(b'password')
         
         '''with open('/home/' + getuser() + '/Desktop/lockpy/sql/.password.key') as f:
             f.write(self.key)'''
