@@ -4,41 +4,36 @@ from base64 import urlsafe_b64encode
 from os import urandom
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
+PATH = '/home/' + getuser() + '/Desktop/lockpy/sql/.salt.bin'
+
 
 class Encryption():
 
-    def __init__(self, key=None) -> None:
-        if not key:
-            self.new_key()
+    def __init__(self) -> None:
+        with open (PATH, 'rb') as f:
+            salt: bytes = f.read()
+        self.new_key(salt)
 
         self.f = Fernet(self.key)
 
 
-    def new_key(self, password: str = None):
-        self.key: bytes = Fernet.generate_key()
-        pbkdf = self.pbkdf_derivation(password)
-        f = Fernet(urlsafe_b64encode(pbkdf))
-        print(f)
+    def new_key(self, salt):
+        self.pbkdf_derivation(salt)
+        f = Fernet(self.key)
         
-        
-        
-        '''with open('/home/' + getuser() + '/Desktop/lockpy/sql/.password.key') as f:
-            f.write(self.key)'''
 
+    def pbkdf_derivation(self, salt: bytes | None) -> None:
+        if not salt:
+            salt: bytes = urandom(16)
 
-    def pbkdf_derivation(self, password: str | None) -> bytes:
-        if not password:
-            password = input('Enter a password for the database: ')
-
-        password = password.encode()
-        salt: bytes = urandom(16)
-        kdf = PBKDF2HMAC(hashes.SHA256(), 32, salt, 1_000_000)
-        key: bytes = kdf.derive(password)
+        password = input('Enter a password for the database: ').encode()
+        pbkdf = PBKDF2HMAC(hashes.SHA256(), 32, salt, 1_000_000)
+        self.key = urlsafe_b64encode(pbkdf.derive(password))
         
-        with open('/home/' + getuser() + '/Desktop/lockpy/sql/.salt.bin', 'w') as f:
+        with open(PATH, 'wb') as f:
             f.write(salt)
-        return key
-    
+
+
     def encrypt(self, data: bytes | str) -> None:
         if isinstance(data, str):
             data = data.encode()

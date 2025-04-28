@@ -220,7 +220,6 @@ def parser(arguments: list[str]) -> tuple[str, tuple[str]]:
 
 # -----------------Note----------------------
 # Add password updating in SQL database / write test for it
-# Write tests for the Database class
 
 def main(args):
     subparse_choosed, user_values = parser(args)

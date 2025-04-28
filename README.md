@@ -22,8 +22,6 @@ I'm actively working on improving this project. Here are some planned features:
 
 - 👻 Deamon to keep the password in RAM
 
-- 🔄 Firefox addon auto-fill and retrieval functionality
-
 #### Installation
 
 To install the Password Generator, clone this repository:
