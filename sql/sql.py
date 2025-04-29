@@ -2,20 +2,18 @@ import sqlite3
 from typing import Generator
 from getpass import getuser
 
+PATH = '/home/' + getuser() + '/Desktop/lockpy/sql/'
+
 class Database():
-
     def __init__(self, path: str) -> None:
-        self.path = '/home/' + getuser() + '/Desktop/lockpy/sql/' + path
+        self.path = PATH + path
         self.connect()
-
 
     def __enter__(self):
         return self
 
-
     def __exit__(self, exc_type, exc_val, exc_tb) -> None:
         self.con.close()
-
 
     def connect(self) -> None:
         self.con = sqlite3.connect(self.path)
@@ -36,12 +34,10 @@ class Database():
                         description TEXT);'''
         self.cursor.execute(sql_command)
 
-
     def add_in_db(self, values: str) -> None:
         sql_command = f'INSERT INTO password VALUES {values};'
         self.cursor.execute(sql_command)
-        self.con.commit()
-        
+        self.con.commit()        
 
     def select_in_db(self, name: str) -> None:
         sql_command = f'SELECT * FROM password'
@@ -50,19 +46,17 @@ class Database():
         self.cursor.execute(sql_command)
         lines = self.cursor.fetchall()
         if not lines:
-            raise ValueError('The service entered doesn\'t exist or the table is empty')
+            raise ValueError('The service entered doesn\'t exist')
         for word in lines:
             d = {'Service': word[0], 'User': word[1], 'Password': word[2], 'Url': word[3], 'Description': word[4]}
             print('-' * 28)
             print('\n'.join(f'{k}: {d[k]}' for k in d if d[k]))
-
 
     def update_db(self, values: dict[str]) -> None:
         name, column, new_value = values['name'], values['column'], values['value']
         sql_command = f'UPDATE password SET {column}="{new_value}" WHERE name="{name}";'
         self.cursor.execute(sql_command)
         self.con.commit()
-
     
     def delete_in_db(self, name: str) -> None:
         sql_command = f'DELETE FROM password WHERE name="{name}";'
@@ -70,9 +64,8 @@ class Database():
         self.con.commit()
 
 
-
 if __name__ == '__main__':
-    with Database('test.db') as db:
+    with Database('test.lp') as db:
         db.add_in_db()
 
 """
@@ -88,9 +81,5 @@ db.add_in_db('emp', sql_value)
 db.update_db('emp', 'lname', 'Jyoti', ['fname', 'Rishabh'])
 
 # SQL formmat to delete a raws
-db.delete_in_db('emp', ['fname', 'Rishabh'])"""
- 
-
-# To save the changes in the files. Never skip this.
-# If we skip this, nothing will be saved in the database.
-# db.con.commit()
+db.delete_in_db('emp', ['fname', 'Rishabh'])
+"""

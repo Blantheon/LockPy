@@ -9,6 +9,7 @@ import modules.check_modules.entropy as entropy
 import modules.check_modules.ibeenpwned as pawned
 from sql.sql import Database
 
+PATH = '/home/' + getuser() + '/Desktop/lockpy/lists/en.txt'
 
 # These class are used to do verification on user input and call function after that
 class NewPassword():
@@ -103,7 +104,7 @@ def check_diceware(arguments: list[str]) -> Tuple[int, str]:
             warnings.warn('The path entered is invalid, the list used is the default english diceware list')
             print('\n')
 
-    return (int(arguments[0]), '/home/' + getuser() + '/Desktop/lockpy/lists/en.txt')
+    return (int(arguments[0]), PATH)
 
 
 def check_parsing(args: argparse.Namespace) -> Tuple[str, ...]:
@@ -239,11 +240,11 @@ def main(args):
     if subparse_choosed == 'save':
         d = NewPassword.save_and_create_password(user_values, methods)
 
-        with Database('password.db') as db:
+        with Database('password.lp') as db:
             db.add_in_db(f'({', '.join(f'"{d[i]}"' if d[i] else 'NULL' for i in d )})')
     
     if subparse_choosed in ['retrieve', 'delete', 'update']:
-        with Database('password.db') as db:
+        with Database('password.lp') as db:
             methods[subparse_choosed](db)(user_values)
 
 

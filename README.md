@@ -2,7 +2,7 @@
 
 ### Overview
 
-Welcome to LockPy, a secure and efficient tool for creating strong passwords with minimal entropy requirements. This project is designed to help users generate robust passwords for enhanced security.
+Welcome to LockPy, a secure and efficient tool for creating and storing strong passwords with minimal entropy requirements. This project is designed to help users generate robust passwords for enhanced security, it's also a password manager that store/retrieve passwords usable in CLI .
 
 ### Features
 
@@ -11,6 +11,8 @@ Welcome to LockPy, a secure and efficient tool for creating strong passwords wit
 - ✅ Calculate entropy of a password
 
 - ✅ Check password status on HaveibeenpawnedAPI
+
+- ✅ Password storing/retrieving in SQL database
 
 - ✅ User-friendly command-line interface (CLI)
 
