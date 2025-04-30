@@ -1,11 +1,11 @@
-from cryptography.fernet import Fernet
+from cryptography.fernet import Fernet, InvalidToken
 from getpass import getuser
 from base64 import urlsafe_b64encode
 from os import urandom
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 
-PATH = '/home/' + getuser() + '/Desktop/lockpy/sql/'
+PATH = '/home/' + getuser() + '/Desktop/lockpy/sql'
 
 
 class Encryption():
@@ -14,6 +14,13 @@ class Encryption():
             salt: bytes = f.read()
         self.pbkdf_derivation(salt)
         self.f = Fernet(self.key)
+
+    def __enter__(self):
+        return self
+    
+    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
+        # implement an errasing of the secret key in memory
+        ...
 
     def pbkdf_derivation(self, salt: bytes | None) -> None:
         to_write = False
@@ -33,11 +40,20 @@ class Encryption():
         if isinstance(data, str):
             data = data.decode()
         encrypted_data: bytes = self.f.encrypt(data)
-        with open(f'{PATH}/database.lp', 'wb') as f:
+        with open(f'{PATH}/database.lp.enc', 'wb') as f:
             f.write(encrypted_data)
 
     def decrypt(self, data: bytes) -> None:
-        ...
+        try:
+            decrypted_data =  self.f.decrypt(data)
+        except InvalidToken:
+            raise InvalidToken('The password entered is invalid')
+        
+        return decrypted_data
 
 
-e = Encryption()
+if __name__ == '__main__':
+    e = Encryption()
+    with open(f'{PATH}/database.lp.enc', 'rb') as f2:
+        enc = f2.read()
+        e.decrypt(enc)
