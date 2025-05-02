@@ -1,4 +1,5 @@
 import sqlite3
+import apsw
 from typing import Generator
 from getpass import getuser
 

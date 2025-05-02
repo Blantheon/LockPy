@@ -5,8 +5,6 @@ from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 import apsw
 from io import BytesIO
-# for tests
-import sqlite3
 
 PATH = '/home/' + getuser() + '/Desktop/lockpy/sql'
 
@@ -34,38 +32,34 @@ class Encryption():
         if isinstance(data, str):
             data = data.decode()
         encrypted_data: bytes = self.f.encrypt(data)
-        with open(f'{PATH}/database.lp.enc', 'wb') as f:
+        with open(f'{PATH}/database.lp', 'wb') as f:
             f.write(encrypted_data)
 
-    def decrypt(self, data: bytes) -> None:
+    def decrypt(self, data_encrypted: bytes) -> None:
         try:
-            decrypted_data =  self.f.decrypt(data)
+            decrypted_data =  self.f.decrypt(data_encrypted)
         except InvalidToken:
             raise InvalidToken('The password entered is invalid')
         
-        return decrypted_data
+        data = BytesIO(decrypted_data)
+        
+        return VFSRamOnly(data)
 
 
 class VFSRamOnly(apsw.VFS):
     def __init__(self, data, vfsname="ramonly", basevfs=""):
         self.vfs_name = vfsname
         self.base_vfs = basevfs
-        self.obj = data
+        self.data = data
         super().__init__(self.vfs_name, self.base_vfs)
 
     def xOpen(self, name, flags) -> None:
-        in_flags = []
-        
-        for k, v in apsw.mapping_open_flags.items():
-            if isinstance(k, int) and flags[0] & k:
-                in_flags.append(v)
-        
-        return VFSRamOnlyFiles(self.base_vfs, name, flags, self.obj)
+        return VFSRamOnlyFiles(self.base_vfs, name, flags, self.data)
 
 
 class VFSRamOnlyFiles(apsw.VFSFile):
-    def __init__(self, inheritfromvfsname, filename, flags, obj):
-        self.buffer = obj
+    def __init__(self, inheritfromvfsname, filename, flags, data):
+        self.buffer = data
         super().__init__(inheritfromvfsname, filename, flags)
     
     def xRead(self, amount, offset):
@@ -73,6 +67,7 @@ class VFSRamOnlyFiles(apsw.VFSFile):
         data = self.buffer.read(amount)
         if len(data) < amount:
             data += b'\x00' * (amount - len(data))
+        
         return data
 
     def xFileSize(self):
@@ -82,14 +77,12 @@ if __name__ == '__main__':
     e = Encryption()
     '''with open(f'{PATH}/database.lp', 'rb') as f1:
         d = f1.read()
-        e.encrypt(d)'''
-    with open(f'{PATH}/database.lp.enc', 'rb') as f2:
-        enc = f2.read()
-        data = e.decrypt(enc)
-
+        e.encrypt(d)
+    '''
     
-    obj = BytesIO(data)
-    vfs = VFSRamOnly(obj)
-    con = apsw.Connection('test.db', vfs=vfs.vfs_name)
-    for i in con.execute("SELECT * FROM password"):
-        print(i)
+    with open(f'{PATH}/database.lp', 'rb') as f2:
+        encrypted_data = f2.read()
+        vfs_object: VFSRamOnly = e.decrypt(encrypted_data)
+        con = apsw.Connection('test.db', vfs=vfs_object.vfs_name)
+        for i in con.execute('SELECT * FROM password'):
+            print(i)
