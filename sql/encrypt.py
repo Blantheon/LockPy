@@ -9,7 +9,7 @@ from io import BytesIO
 PATH = '/home/' + getuser() + '/Desktop/lockpy/sql'
 
 
-class Encryption():
+class Cryptography():
     def __init__(self) -> None:
         self.pbkdf_derivation()
         self.f = Fernet(self.key)
@@ -32,7 +32,7 @@ class Encryption():
         if isinstance(data, str):
             data = data.decode()
         encrypted_data: bytes = self.f.encrypt(data)
-        with open(f'{PATH}/database.lp', 'wb') as f:
+        with open(f'{PATH}/test.lp.enc', 'wb') as f:
             f.write(encrypted_data)
 
     def decrypt(self, data_encrypted: bytes) -> None:
@@ -41,20 +41,20 @@ class Encryption():
         except InvalidToken:
             raise InvalidToken('The password entered is invalid')
         
-        data = BytesIO(decrypted_data)
-        
-        return VFSRamOnly(data)
+        return decrypted_data
 
-
+# these VFS are used to read the data into the memory and avoid writing it in clear
 class VFSRamOnly(apsw.VFS):
     def __init__(self, data, vfsname="ramonly", basevfs=""):
         self.vfs_name = vfsname
         self.base_vfs = basevfs
         self.data = data
+        self.files: VFSRamOnlyFiles
         super().__init__(self.vfs_name, self.base_vfs)
 
     def xOpen(self, name, flags) -> None:
-        return VFSRamOnlyFiles(self.base_vfs, name, flags, self.data)
+        self.files = VFSRamOnlyFiles(self.base_vfs, name, flags, self.data)
+        return self.files
 
 
 class VFSRamOnlyFiles(apsw.VFSFile):
@@ -67,22 +67,52 @@ class VFSRamOnlyFiles(apsw.VFSFile):
         data = self.buffer.read(amount)
         if len(data) < amount:
             data += b'\x00' * (amount - len(data))
-        
         return data
+
+    def xWrite(self, data, offset):
+        current = len(self.buffer.getvalue())
+        end = len(data) + offset
+        if current < end:
+            self.buffer.seek(0,2)
+            self.buffer.write(b'\x00' * (end - current))
+        
+        self.buffer.seek(offset)
+        self.buffer.write(data)
+
+    def xTruncate(self, size):
+        self.buffer.seek(0)
+        self.buffer.truncate(size)
 
     def xFileSize(self):
         return len(self.buffer.getvalue())
 
 if __name__ == '__main__':
-    e = Encryption()
+    e = Cryptography()
     '''with open(f'{PATH}/database.lp', 'rb') as f1:
         d = f1.read()
         e.encrypt(d)
     '''
     
-    with open(f'{PATH}/database.lp', 'rb') as f2:
+    with open(f'{PATH}/database.lp.enc', 'rb') as f2:
         encrypted_data = f2.read()
         vfs_object: VFSRamOnly = e.decrypt(encrypted_data)
         con = apsw.Connection('test.db', vfs=vfs_object.vfs_name)
-        for i in con.execute('SELECT * FROM password'):
+        con.execute('''CREATE TABLE hi(\
+                        name TEXT PRIMARY KEY NOT NULL,\
+                        user TEXT,\
+                        password TEXT NOT NULL,\
+                        url TEXT,\
+                        description TEXT);''')
+        con.execute('''INSERT INTO hi VALUES ("Blant","Heon", "M", NULL, NULL)''')
+        con.execute('''INSERT INTO hi VALUES ("google","googleman", "passW", "https://google.com", "A Big Description")''')
+        for i in con.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='hi';"):
             print(i)
+
+        lines = [i for i in con.execute("SELECT * FROM hi")]
+        print(lines)
+        
+        if not lines: print('ok not lines')
+        for line in lines:
+            print(line)
+
+        
