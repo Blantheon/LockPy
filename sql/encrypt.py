@@ -46,6 +46,38 @@ class Encryption():
         return decrypted_data
 
 
+class VFSRamOnly(apsw.VFS):
+    def __init__(self, data, vfsname="ramonly", basevfs=""):
+        self.vfs_name = vfsname
+        self.base_vfs = basevfs
+        self.obj = data
+        super().__init__(self.vfs_name, self.base_vfs)
+
+    def xOpen(self, name, flags) -> None:
+        in_flags = []
+        
+        for k, v in apsw.mapping_open_flags.items():
+            if isinstance(k, int) and flags[0] & k:
+                in_flags.append(v)
+        
+        return VFSRamOnlyFiles(self.base_vfs, name, flags, self.obj)
+
+
+class VFSRamOnlyFiles(apsw.VFSFile):
+    def __init__(self, inheritfromvfsname, filename, flags, obj):
+        self.buffer = obj
+        super().__init__(inheritfromvfsname, filename, flags)
+    
+    def xRead(self, amount, offset):
+        self.buffer.seek(offset)
+        data = self.buffer.read(amount)
+        if len(data) < amount:
+            data += b'\x00' * (amount - len(data))
+        return data
+
+    def xFileSize(self):
+        return len(self.buffer.getvalue())
+
 if __name__ == '__main__':
     e = Encryption()
     '''with open(f'{PATH}/database.lp', 'rb') as f1:
@@ -55,5 +87,9 @@ if __name__ == '__main__':
         enc = f2.read()
         data = e.decrypt(enc)
 
+    
     obj = BytesIO(data)
-    con = apsw.Connection(':memory', vfs=obj)
+    vfs = VFSRamOnly(obj)
+    con = apsw.Connection('test.db', vfs=vfs.vfs_name)
+    for i in con.execute("SELECT * FROM password"):
+        print(i)
