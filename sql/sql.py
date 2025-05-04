@@ -22,9 +22,9 @@ class Database():
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         # encrypt the database
-        self.vfs.files.buffer.seek(0)
+        '''self.vfs.files.buffer.seek(0)
         self.crypto.encrypt(self.vfs.files.buffer.read())
-        self.con.close()
+        self.con.close()'''
         os.remove(PATH + '.Nothing')
 
 
@@ -44,7 +44,7 @@ class Database():
             with open(self.path, 'rb') as f:
                 self.db_bytes = BytesIO(f.read())
         self.vfs = VFSRamOnly(self.db_bytes)
-        self.con = apsw.Connection('.Nothing', vfs=self.vfs.vfs_name)
+        self.con = apsw.Connection(PATH +'.Nothing', vfs=self.vfs.vfs_name)
         self.create_table()
 
     def create_table(self):
@@ -85,10 +85,20 @@ class Database():
 
 
 if __name__ == '__main__':
+    if os.path.isfile(PATH + 'database.lp'):
+        os.remove(PATH + 'database.lp')
     with Database('database.lp') as db:
-        db.add_in_db('("YoBro","Myman", "A Good Pass", "https://gge.com", "A Big ldfsjfldsv Description")')
-        db.select_in_db('all')
-    
+        db.add_in_db('("google","Myman", "A Good Pass", "https://gge.com", "A Big ldfsjfldsv Description")')
+        f = open('just_add.db', 'wb')
+        f.write(db.vfs.files.buffer.read())
+        f.close()
+
+        db.update_db({'name': 'google', 'column': 'password', 'value': 'Pass'})
+        f = open('updated.db', 'wb')
+        f.write(db.vfs.files.buffer.read())
+        f.close
+        #db.select_in_db('all')
+        db.select_in_db('google')
         
 
 

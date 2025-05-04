@@ -13,7 +13,6 @@ PATH = '/home/' + getuser() + '/Desktop/lockpy/lists/en.txt'
 
 # These class are used to do verification on user input and call function after that
 class NewPassword():
-
     @staticmethod
     def create_password_str(entropy_user: int) -> str:
         if int(entropy_user) < 0:
@@ -23,12 +22,10 @@ class NewPassword():
 
         return password_mod.create_password_string(entropy_user)
 
-
     @staticmethod
     def create_password_dice(entropy_path: list[str, int]) -> str:
         entropy_user, list_path = entropy_path
-        return password_mod.create_password_diceware(entropy_user, list_path)
-    
+        return password_mod.create_password_diceware(entropy_user, list_path)    
 
     @staticmethod
     def save_and_create_password(d, methods):
@@ -57,7 +54,6 @@ class NewPassword():
 
 
 class CheckMethods():
-    
     @staticmethod
     def calculate_password_entropy(password: str) -> str:
         nb_spaces = password.count(' ')
@@ -67,7 +63,6 @@ class CheckMethods():
         else:
             print('The password is treated like a diceware password')
             return entropy.calculate_entropy_diceware(password)
-
 
     @staticmethod
     def check_pawned(password: str) -> str:
@@ -94,7 +89,6 @@ def check_diceware(arguments: list[str]) -> Tuple[int, str]:
     if int(arguments[0]) < 90:
         warnings.warn('For a strong password we recommend using at least 90 bit of entropy')
         print('\n')
-
 
     if len(arguments) == 2:
         # check location of the flag lists with os module
@@ -219,9 +213,6 @@ def parser(arguments: list[str]) -> tuple[str, tuple[str]]:
     args = parser.parse_args(arguments)
     return check_parsing(args)
 
-# -----------------Note----------------------
-# Add password updating in SQL database / write test for it
-
 def main(args):
     subparse_choosed, user_values = parser(args)
     methods = {'str': NewPassword.create_password_str,
@@ -240,11 +231,11 @@ def main(args):
     if subparse_choosed == 'save':
         d = NewPassword.save_and_create_password(user_values, methods)
 
-        with Database('password.lp') as db:
+        with Database('database.lp') as db:
             db.add_in_db(f'({', '.join(f'"{d[i]}"' if d[i] else 'NULL' for i in d )})')
     
     if subparse_choosed in ['retrieve', 'delete', 'update']:
-        with Database('password.lp') as db:
+        with Database('database.lp') as db:
             methods[subparse_choosed](db)(user_values)
 
 

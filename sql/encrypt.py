@@ -81,8 +81,7 @@ class VFSRamOnlyFiles(apsw.VFSFile):
         self.buffer.write(data)
 
     def xTruncate(self, size):
-        self.buffer.seek(0)
-        self.buffer.truncate(size)
+        super().xTruncate()
 
     def xFileSize(self):
         return len(self.buffer.getvalue())
